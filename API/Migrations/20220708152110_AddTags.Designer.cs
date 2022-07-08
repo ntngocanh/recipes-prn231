@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(RecipeDbContext))]
-    [Migration("20220707090336_InitialDB")]
-    partial class InitialDB
+    [Migration("20220708152110_AddTags")]
+    partial class AddTags
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -85,6 +85,21 @@ namespace API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("API.Models.FeaturedTag", b =>
+                {
+                    b.Property<int>("FeaturedTagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("FeaturedTagId");
+
+                    b.ToTable("FeaturedTags");
                 });
 
             modelBuilder.Entity("API.Models.Ingredient", b =>

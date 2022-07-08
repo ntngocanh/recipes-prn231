@@ -26,7 +26,7 @@ namespace API.Models
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Reaction> Reactions { get; set; }
         public virtual DbSet<Recipe> Recipes { get; set; }
-
+        public virtual DbSet<FeaturedTag> FeaturedTags { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Reaction>().HasKey(r => new { r.UserId, r.RecipeId });

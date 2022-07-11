@@ -6,19 +6,19 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace BusinessObjects.Models
 {
     public class RecipeDbContext : DbContext
     {
         public RecipeDbContext() { }
         public RecipeDbContext(DbContextOptions<RecipeDbContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-            optionsBuilder.UseSqlServer(config.GetConnectionString("RecipeDB"));
+            //var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("RecipeDB"));
         }
         public virtual DbSet<Collection> Collections { get; set; }
         public virtual DbSet<User> Users { get; set; }

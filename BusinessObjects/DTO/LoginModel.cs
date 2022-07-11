@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTO
+namespace BusinessObjects.DTO
 {
     public class LoginModel
     {

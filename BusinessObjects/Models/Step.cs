@@ -5,15 +5,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace BusinessObjects.Models
 {
-    public class Reaction
+    public class Step
     {
-        [Key, Column(Order = 0)]
-        public int UserId { get; set; }
-        [Key, Column(Order = 1)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int StepId { get; set; }
+        public int Order { get; set; }
+        public string Text { get; set; }
+        public string Image { get; set; }
         public int RecipeId { get; set; }
-        public virtual User User { get; set; }
         public virtual Recipe Recipe { get; set; }
     }
 }

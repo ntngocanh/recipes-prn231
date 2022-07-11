@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace BusinessObjects.Models
 {
-    public class Role
+    public class FeaturedTag
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int RoleId { get; set; }
-        public string RoleName { get; set; }
+        public int FeaturedTagId { get; set; }
+        public string Name { get; set; }
     }
 }

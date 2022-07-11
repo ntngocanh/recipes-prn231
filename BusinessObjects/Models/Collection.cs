@@ -5,17 +5,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace BusinessObjects.Models
 {
-    public class Comment
+    public class Collection
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CommentId { get; set; }
+        public int CollectionId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
         public int UserId { get; set; }
-        public int RecipeId { get; set; }
         public virtual User User { get; set; }
-        public virtual Recipe Recipe { get; set; }
-        public string Text { get; set; }
-        public CommentStatus CommentStatus { get; set; }
+        public virtual ICollection<CollectionRecipe> CollectionRecipes { get; set; }
     }
 }

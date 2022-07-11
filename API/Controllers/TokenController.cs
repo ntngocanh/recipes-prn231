@@ -1,5 +1,6 @@
 ﻿using API.DTO;
-using API.Models;
+using BusinessObjects.DTO;
+using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

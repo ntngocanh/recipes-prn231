@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace BusinessObjects.Models
 {
     public class Recipe
     {
@@ -19,6 +19,8 @@ namespace API.Models
         public RecipeStatus RecipeStatus { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
+        public virtual ICollection<Ingredient> Ingredients { get; set; }
+        public virtual ICollection<Step> Steps { get; set; }
         public virtual ICollection<Reaction> Reactions { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
     }

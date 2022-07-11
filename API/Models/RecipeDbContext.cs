@@ -11,6 +11,10 @@ namespace API.Models
     public class RecipeDbContext : DbContext
     {
         public RecipeDbContext() { }
+        public RecipeDbContext(DbContextOptions<RecipeDbContext> options)
+            : base(options)
+        {
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();

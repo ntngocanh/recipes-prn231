@@ -17,8 +17,8 @@ namespace BusinessObjects.DTO
         public RecipeStatus RecipeStatus { get; set; }
         public int UserId { get; set; }
         public virtual UserDTO User { get; set; }
-        public virtual ICollection<Ingredient> Ingredients { get; set; }
-        public virtual ICollection<Step> Steps { get; set; }
+        public virtual ICollection<IngredientDTO> Ingredients { get; set; }
+        public virtual ICollection<StepDTO> Steps { get; set; }
         //public virtual ICollection<Reaction> Reactions { get; set; }
         //public virtual ICollection<Comment> Comments { get; set; }
     }

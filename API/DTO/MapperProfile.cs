@@ -14,6 +14,8 @@ namespace API.DTO
         {
             CreateMap<Recipe, RecipeDTO>();
             CreateMap<User, UserDTO>();
+            CreateMap<Ingredient, IngredientDTO>();
+            CreateMap<Step, StepDTO>();
         }
     }
 }

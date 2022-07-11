@@ -39,7 +39,11 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)
         {
-            var recipe = await _context.Recipes.Include(r => r.User).FirstOrDefaultAsync(r => r.RecipeId == id);
+            var recipe = await _context.Recipes
+                .Include(r => r.User)
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .FirstOrDefaultAsync(r => r.RecipeId == id);
 
             if (recipe == null)
             {

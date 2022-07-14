@@ -3,84 +3,68 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>RecipeDTO</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.RecipeId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.RecipeId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Duration)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Duration)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateCreated)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DateCreated)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.RecipeStatus)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.RecipeStatus)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Ingredients)
-        </dt>
-        @foreach (var item in Model.Ingredients)
+<link rel="stylesheet" href="~/css/detailsRecipe.css" />
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8 the-one-div">
+        @if (Model.Image != null && Model.Image.Trim().Length > 0)
         {
 
-            <dd class="col-sm-10">
-                @item.Text
-            </dd>
+            <div class="fill">
+                <img src="~/images/@Model.Image" height="200" alt="Recipe Image" id="recipeImage">
+            </div>
         }
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Steps)
-        </dt>
-        @foreach (var item in Model.Steps)
-        {
+        <div class="section">
+            <div class="form-group">
+                <span asp-for="Name" id="nameBox">@Model.Name</span>
+            </div>
+            <div class="form-group">
+                <span id="descriptionBox" asp-for="Description"></span>
+            </div>
+            <hr />
+            <div class="center">
+                <div>&#9201; @Model.Duration</div>
+            </div>
+            <hr />
+        </div>
+        <div class="section">
+            <div class="tableTitle">Nguyên liệu</div>
+            @foreach (var item in Model.Ingredients)
+            {
+                <div>@item.Text</div>
+                <hr />
+            }
+        </div>
+        <div class="section">
+            <div class="tableTitle">Các bước</div>
+            @foreach (var item in Model.Steps)
+            {
+                <div class="step-div">
+                    <span>@item.Order .</span>
+                    <span>@item.Text</span>
+                    @if (item.Image != null && item.Image.Trim().Length > 0)
+                    {
+                        <img class="step-img" src="~/images/@item.Image" />
+                    }
+                </div>
 
-            <dd class="col-sm-10">
-                @item.Text
-            </dd>
-        }
-    </dl>
+            }
+        </div>
+    </div>
+    <div class="col-md-2"></div>
 </div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+<script type="text/javascript">
+    $("#addIngredientBtn").on("click", function () {
+        console.log("clicked");
+        $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

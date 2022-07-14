@@ -1,0 +1,74 @@
+﻿body {
+    background-color: #F8F6F2;
+}
+.the-one-div{
+    background-color: white;
+    padding: 0;
+}
+input {
+    background-color: #F8F6F2;
+}
+
+.section {
+    background-color: white;
+    padding: 0 20px 0 20px;
+    margin: 0;
+}
+
+.clickable {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#descriptionBox {
+    height: 77px;
+    font-size: 20px;
+}
+
+#nameBox {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 450px;
+    margin-bottom: 20px;
+}
+
+    .fill img {
+        flex-shrink: 0;
+        width: 100%;
+        height: 100%
+    }
+
+.tableTitle {
+    font-size: 23px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ingredientsTable input {
+    width: 100%;
+}
+
+.step-img {
+    width: 200px;
+    border-radius: .5rem;
+    margin: 10px;
+    margin-left: 25px;
+    display: block;
+}
+.step-div{
+    margin-bottom: 10px;
+    font-size: 19px;
+}

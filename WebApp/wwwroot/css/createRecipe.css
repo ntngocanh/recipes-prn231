@@ -1,0 +1,59 @@
+﻿body{
+    background-color: #F8F6F2;
+}
+input {
+    background-color: #F8F6F2;
+}
+.section{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+.clickable{
+    cursor: pointer;
+    font-weight: 500;
+}
+#descriptionBox{
+    height: 77px;
+    font-size: 20px;
+}
+#nameBox{
+    font-size:32px;
+    font-weight:600;
+}
+.fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 450px;
+    margin-bottom: 20px;
+}
+
+.fill img {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%
+}
+.tableTitle {
+    font-size: 23px;
+    font-weight: 500;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#ingredientsTable input, #stepsTable input{
+    width: 100%;
+}
+.step-img {
+    width: 200px;
+    border-radius: .5rem;
+    margin: 0;
+    display: block;
+}
+
+

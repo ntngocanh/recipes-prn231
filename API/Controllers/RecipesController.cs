@@ -28,7 +28,6 @@ namespace API.Controllers
         }
 
         // GET: api/Recipes
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
         {
@@ -92,7 +91,7 @@ namespace API.Controllers
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRecipe", new { id = recipe.RecipeId }, recipe);
+            return recipe;
         }
 
         // DELETE: api/Recipes/5
@@ -115,5 +114,6 @@ namespace API.Controllers
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
+
     }
 }

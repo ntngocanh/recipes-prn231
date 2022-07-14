@@ -48,6 +48,7 @@ namespace API.Controllers
                     new Claim("Name", user.Name),
                     new Claim("Avatar", user.Avatar),
                     new Claim("Email", user.Email),
+                    new Claim("UserId", user.UserId.ToString()),
                     new Claim(ClaimTypes.Role,user.Role.RoleName)
                    };
 

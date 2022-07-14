@@ -66,7 +66,7 @@ namespace WebApp.Controllers
                 u.RoleName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value;
                 SessionExtension.Set<UserDTO>(HttpContext.Session, "user", u);
                 HttpContext.Session.SetString("token", token);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
             else
             {

@@ -80,7 +80,7 @@ namespace API.Controllers
             _context.Steps.Add(step);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStep", new { id = step.StepId }, step);
+            return step;
         }
 
         // DELETE: api/Steps/5

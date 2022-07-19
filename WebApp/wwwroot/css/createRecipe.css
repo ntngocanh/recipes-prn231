@@ -55,5 +55,15 @@ input {
     margin: 0;
     display: block;
 }
+.step-img-null {
+    width: 100px;
+    border-radius: .5rem;
+    margin: 0;
+    display: block;
+}
+.deleteIngre, .deleteStep{
+    cursor: pointer;
+    margin-left: 10px;
+}
 
 

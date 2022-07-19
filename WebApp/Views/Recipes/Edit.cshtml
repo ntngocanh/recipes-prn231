@@ -46,15 +46,18 @@
                     <tbody>
                         @foreach (var item in Model.Ingredients)
                         {
-                            <tr>
+                            <tr id="ingre-@item.IngredientId">
                                 <td>
-                                    <input type="text" placeholder="250g bột" class="form-control" value="@item.Text"/>
+                                    <input type="text" placeholder="250g bột" class="form-control" value="@item.Text" id="val-ingre-@item.IngredientId" />
                                 </td>
                                 <td>
-                                    <span class="clickable">...</span>
+                                    <span class="clickable deleteIngredient" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <span class="deleteIngre" id="del-ingre-@item.IngredientId">Xóa nguyên liệu</span>
+                                    </div>
                                 </td>
                             </tr>
-}
+                        }
                     </tbody>
                 </table>
                 <div class="center">
@@ -67,26 +70,35 @@
                     <tbody>
                         @foreach (var item in Model.Steps)
                         {
-                            <tr>
-                                <td><input type="text" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control" value="@item.Text" /></td>
+                            <tr id="step-@item.StepId">
+                                <td><input type="text" id="val-step-@item.StepId" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control" value="@item.Text" /></td>
                                 <td>
-                                    <span class="clickable">...</span>
+                                    <span class="clickable deleteStep" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <span class="deleteStep" id="del-step-@item.StepId">Xóa bước này</span>
+                                    </div>
                                 </td>
                             </tr>
 
-                            @if (item.Image != null && item.Image.Trim().Length > 0)
-                            {
-                    <tr>
-                        <td><img class="step-img" src="~/images/@item.Image" /></td>
-                    </tr>
-                        }
-                        }
+                            <tr id="step-img-section-@item.StepId">
+                                <td>
+                                    @if (item.Image != null && item.Image.Trim().Length > 0)
+                                    {
+                                        <img class="step-img" src="~/images/@item.Image" id="img-step-@item.StepId" />
+                                    }
+                                    else
+                                    {
+                                        <img class="step-img-null" src="~/images/camera.jpg" id="img-step-null-@item.StepId" />
+                                    }
+                                </td>
+                            </tr>
+            }
                         </tbody>
-                    </table>
-                <div class="center">
-                    <span id="addStepBtn" class="clickable">+ Bước làm</span>
-                </div>
-            </div>
+                        </table>
+                        <div class="center">
+                            <span id="addStepBtn" class="clickable">+ Bước làm</span>
+                        </div>
+</div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -116,13 +128,127 @@
                         }
 </script>
 <script type="text/javascript">
+    $(document).on("click", '[id^="del-ingre-"]', function () {
+        var id = $(this).attr("id").replace("del-ingre-", "");
+        if (confirm("Do you really want to delete this ingredient?")) {
+
+            $.ajax({
+                url: "https://localhost:5001/api/Ingredients/" + id,
+                type: "delete",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    $("#ingre-" + id).remove();
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        }
+    });
+    $(document).on("click", '[id^="del-step-"]', function () {
+        var id = $(this).attr("id").replace("del-step-", "");
+        if (confirm("Do you really want to delete this step?")) {
+
+            $.ajax({
+                url: "https://localhost:5001/api/Steps/" + id,
+                type: "delete",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    console.log("step deleted");
+                    $("#step-" + id).remove();
+                    $("#step-img-section-" + id).remove();
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        }
+    });
     $("#addIngredientBtn").on("click", function () {
-        console.log("clicked");
-        $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
+        $("#ingredientsTable").append(
+            '<tr id="ingre-new"><td><input type="text" placeholder="250g bột" class="form-control" id="val-ingre-new"/></td><td><span class="clickable deleteIngredient" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteIngre" id="del-ingre-new">Xóa nguyên liệu</span></div></td></tr>');
+
+        $.ajax({
+            url: "https://localhost:5001/api/Ingredients",
+            type: "post",
+            data: JSON.stringify({
+                IngredientId: 0,
+                RecipeId: @Model.RecipeId
+            }),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+                $("#ingre-new").attr("id", "ingre-" + result["ingredientId"]);
+                $("#del-ingre-new").attr("id", "del-ingre-" + result["ingredientId"]);
+                $("#val-ingre-new").attr("id", "val-ingre-" + result["ingredientId"]);
+                console.log("ingredient added");
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
     });
     $("#addStepBtn").on("click", function () {
-        console.log("clicked");
-        $("#stepsTable").append('<tr><td><input type="text" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control"/></td><td><span class="clickable">...</span></td></tr>');
+        $("#stepsTable").append('<tr id="step-new"><td><input type="text" id="val-step-new" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control"/></td><td><span class="clickable deleteStep" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteStep" id="del-step-new">Xóa bước này</span></div></td></tr><tr id="step-img-section-new"><td><img class="step-img-null" id="img-step-null-new" /></td></tr>');
+        $.ajax({
+            url: "https://localhost:5001/api/Steps",
+            type: "post",
+            data: JSON.stringify({
+                StepId: 0,
+                RecipeId: @Model.RecipeId
+            }),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+                $("#step-new").prop("id", "step-" + result["stepId"]);
+                $("#del-step-new").prop("id", "del-step-" + result["stepId"]);
+                $("#val-step-new").prop("id", "val-step-" + result["stepId"]);
+                $("#step-img-section-new").prop("id", "step-img-section-" + result["stepId"]);
+                $("#img-step-null-new").prop("src", "/images/camera.jpg");
+                $("#img-step-null-new").prop("id", "img-step-null" + result["stepId"]);
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+    $('[id^="val-ingre-"]').on("change", function () {
+        $.ajax({
+            url: "https://localhost:5001/api/Ingredients/" + $(this).attr("id").replace("val-ingre-", ""),
+            type: "put",
+            data: JSON.stringify({
+                IngredientId: $(this).attr("id").replace("val-ingre-", ""),
+                RecipeId: @Model.RecipeId,
+                Text: $(this).val()
+            }),
+            processData: false,
+            contentType: 'application/json',
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+    $('[id^="val-step-"]').on("change", function () {
+        console.log("step changed")
+        $.ajax({
+            url: "https://localhost:5001/api/Steps/" + $(this).attr("id").replace("val-step-", ""),
+            type: "put",
+            data: JSON.stringify({
+                StepId: $(this).attr("id").replace("val-step-", ""),
+                RecipeId: @Model.RecipeId,
+                Text: $(this).val(),
+                Image: $("#img-step-" + $(this).attr("id").replace("val-step-", "")).attr("src").split('/').pop()
+            }),
+            processData: false,
+            contentType: 'application/json',
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
     });
 </script>
 @section Scripts {

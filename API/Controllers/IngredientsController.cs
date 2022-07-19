@@ -80,7 +80,7 @@ namespace API.Controllers
             _context.Ingredients.Add(ingredient);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetIngredient", new { id = ingredient.IngredientId }, ingredient);
+            return ingredient;
         }
 
         // DELETE: api/Ingredients/5

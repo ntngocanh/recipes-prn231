@@ -35,6 +35,8 @@ namespace API
             {
                 options.UseSqlServer(Configuration.GetConnectionString("RecipeDB"));
             });
+            services.AddCors();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -65,6 +67,11 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
+            app.UseCors(builder => {
+                builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+            });
 
             app.UseHttpsRedirection();
 

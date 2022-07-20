@@ -72,3 +72,41 @@ input {
     margin-bottom: 10px;
     font-size: 19px;
 }
+
+.form-rounded {
+    border-radius: 1rem;
+}
+
+.textarea {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    /*resize: both;*/
+    min-height: 20px;
+    line-height: 20px;
+    resize: none;
+    padding:10px;
+}
+
+    .textarea[contenteditable]:empty::before {
+        content: "Placeholder still possible";
+        color: gray;
+    }
+
+.reply {
+    margin-left: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+}
+
+.comment-content{
+    margin-left: 15px
+}
+
+.commentId{
+    display: none;
+}
+
+.replies-section{
+    margin-top: 0.5rem;
+}

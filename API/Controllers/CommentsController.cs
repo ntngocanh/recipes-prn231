@@ -4,6 +4,7 @@ using BusinessObjects.DTO;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -55,7 +56,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId && x.ParentCommentId == null).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId && x.ParentCommentId == null && x.CommentStatus== CommentStatus.Posted).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -75,7 +76,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.ParentCommentId == commentId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.ParentCommentId == commentId && x.CommentStatus == CommentStatus.Posted).ToList();
             if (comments == null)
             {
                 return NotFound();

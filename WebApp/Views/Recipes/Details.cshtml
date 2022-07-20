@@ -3,7 +3,11 @@
 @{
     ViewData["Title"] = "Details";
 }
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="~/css/detailsRecipe.css" />
+<link rel="stylesheet" href="~/css/avatar.css" />
+
 <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
@@ -56,15 +60,122 @@
 
             }
         </div>
+        <hr />
+        <div class="section" id="comment-section">
+            <div class="tableTitle"><i style="margin-right:10px" class="fa-regular fa-message"></i>Bình luận</div>
+            <div id="comment-box">
+                <span>
+                    <textarea rows="1" id="comment-input" class="textarea form-rounded" role="textbox" contenteditable></textarea>
+
+                </span>
+                <button class="float-right btn" type="button">Post</button>
+
+            </div>
+            <div class="ui comment">
+
+                @foreach (var comment in ViewBag.Comments)
+                {
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar avatar-sm rounded-circle">
+                                                <img class="avatar-img" src="/images/@comment.User.Avatar" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="ms-2 ms-md-3 comment-content">
+                                            <div class="d-flex align-items-baseline">
+                                                <h6 class="me-2">@comment.User.Name</h6>
+                                            </div>
+                                            <div class="commentId">@comment.CommentId</div>
+                                            <div>@comment.Text</div>
+                                            <div>
+                                                <a href="#" class="reply">Reply</a>
+                                            </div>
+                                            @if (comment.NumberOfReplies > 0)
+                                            {
+                                                <div>
+                                                    <a class="show-replies" href="#"><i class="fa-solid fa-angle-down"></i><b>Show @comment.NumberOfReplies replies</b></a>
+                                                </div>
+                                                <div class="replies-section"></div>
+                                            }
+                                            
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                }
+            </div>
+
+        </div>
     </div>
     <div class="col-md-2"></div>
 </div>
+
 <script type="text/javascript">
+
+    var textarea = document.getElementById("comment-input");
+    var limit = 200;
+
+    textarea.oninput = function () {
+        textarea.style.height = "";
+        textarea.style.height = Math.min(textarea.scrollHeight, 300) + "px";
+    };
     $("#addIngredientBtn").on("click", function () {
         console.log("clicked");
         $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
     });
+    
 </script>
 @section Scripts {
+    <script type="text/javascript">
+        $(".show-replies").on("click", function () {
+            var showButton = this;
+            var repliesSection = $(this).parent().next();
+            //console.log(repliesSection.text());
+            var commentid = $(this).parent().parent().find("div:nth-child(2)").text();
+            var htmlContent = "";
+            $.ajax({
+                url: "https://localhost:5001/api/Comments/getByComment/" + commentid,
+                type: "get",
+                contentType: "application/json; charset=utf-8",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, value) {
+                        console.log(value["user"]["avatar"]);
+                        
+                        htmlContent += `<div class="d-flex mb-4">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar avatar-sm rounded-circle">
+                                                        <img class="avatar-img" src="/images/` + value["user"]["avatar"] + `" alt="">
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 comment-content">
+                                                    <div class="d-flex align-items-baseline">
+                                                        <h6 class="me-2">` + value["user"]["name"] + `</h6>
+                                                    </div>
+                                                    <div>` + 
+                                                        value["text"]
+                            + `</div>
+<div>
+                                                <a href="#" class="reply">Reply</a>
+                                            </div>
+                                                </div>
+                                            </div>`;
+                        repliesSection.html(htmlContent);
+                    });
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+            $(this).hide();
+
+        });
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

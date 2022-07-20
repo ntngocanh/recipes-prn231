@@ -1,0 +1,131 @@
+﻿@model WebApp.Models.RecipeViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<link rel="stylesheet" href="~/css/createRecipe.css" />
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div class="section">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input type="file" asp-for="Image" accept="image/*" onchange="previewFile()" />
+                </div>
+                <div class="fill">
+                    <img src="" height="200" alt="Image preview..." id="recipeImage">
+                </div>
+                <div class="form-group">
+                    <input asp-for="Name" class="form-control" id="nameBox" placeholder="Tên món: Bánh bột mì" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <textarea id="descriptionBox" asp-for="Description" class="form-control" placeholder="Hãy chia sẻ với mọi người về món này của bạn nhé - ai đã truyền cảm hứng cho bạn, tại sao nó đặc biệt, bạn nấu món này cho ai?"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label asp-for="Duration" class="control-label"></label>
+                    </div>
+                    <div class="col-6">
+                        <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="tableTitle">Nguyên liệu</div>
+                <table class="table" id="ingredientsTable">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="text" placeholder="250g bột" class="form-control" />
+                            </td>
+                            <td>
+                                <span class="clickable">...</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" placeholder="100ml nước" class="form-control" />
+                            </td>
+                            <td>
+                                <span class="clickable">...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="center">
+                    <span id="addIngredientBtn" class="clickable">+ Nguyên liệu</span>
+                </div>
+            </div>
+            <div class="section">
+                <div class="tableTitle">Các bước</div>
+                <table class="table" id="stepsTable">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="text" placeholder="250g bột" class="form-control" />
+                            </td>
+                            <td>
+                                <span class="clickable">...</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" placeholder="100ml nước" class="form-control" />
+                            </td>
+                            <td>
+                                <span class="clickable">...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="center">
+                    <span id="addStepBtn" class="clickable">+ Bước làm</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            <div>
+                <a asp-action="Index">Back to List</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+<script>
+    function previewFile() {
+        var preview = document.querySelector('img');
+        var file = document.querySelector('input[type=file]').files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+</script>
+<script type="text/javascript">
+    $("#addIngredientBtn").on("click", function () {
+        console.log("clicked");
+        $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

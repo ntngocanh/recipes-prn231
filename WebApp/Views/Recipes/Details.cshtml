@@ -1,0 +1,70 @@
+﻿@model BusinessObjects.DTO.RecipeDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+<link rel="stylesheet" href="~/css/detailsRecipe.css" />
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8 the-one-div">
+        @if (Model.Image != null && Model.Image.Trim().Length > 0)
+        {
+
+            <div class="fill">
+                <img src="~/images/@Model.Image" height="200" alt="Recipe Image" id="recipeImage">
+            </div>
+        }
+        <div class="section">
+            <div class="form-group">
+                <span asp-for="Name" id="nameBox">@Model.Name</span>
+            </div>
+            <div class="form-group">
+                <span id="descriptionBox" asp-for="Description"></span>
+            </div>
+            <hr />
+            <div class="center">
+                <div>&#9201; @Model.Duration</div>
+            </div>
+            <hr />
+        </div>
+        <div class="section">
+            <div class="tableTitle">Nguyên liệu</div>
+            @foreach (var item in Model.Ingredients)
+            {
+                <div>@item.Text</div>
+                <hr />
+            }
+        </div>
+        <div class="section">
+            <div class="tableTitle">Các bước</div>
+            @foreach (var item in Model.Steps)
+            {
+                <div class="step-div">
+                    <span>@item.Order .</span>
+                    <span>@item.Text</span>
+                    @if (item.Image != null && item.Image.Trim().Length > 0)
+                    {
+                        <img class="step-img" src="~/images/@item.Image" />
+                    }
+                </div>
+
+            }
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+<script type="text/javascript">
+    $("#addIngredientBtn").on("click", function () {
+        console.log("clicked");
+        $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
+    });
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -5,7 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using API.Models;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using API.DTO;
+using BusinessObjects.Models;
+using BusinessObjects.DTO;
 
 namespace API.Controllers
 {
@@ -14,10 +18,13 @@ namespace API.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly RecipeDbContext _context;
-
+        private MapperConfiguration config;
+        private IMapper mapper;
         public RecipesController(RecipeDbContext context)
         {
             _context = context;
+            config = new MapperConfiguration(cf => cf.AddProfile(new MapperProfile()));
+            mapper = config.CreateMapper();
         }
 
         // GET: api/Recipes
@@ -29,16 +36,20 @@ namespace API.Controllers
 
         // GET: api/Recipes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Recipe>> GetRecipe(int id)
+        public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)
         {
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes
+                .Include(r => r.User)
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .FirstOrDefaultAsync(r => r.RecipeId == id);
 
             if (recipe == null)
             {
                 return NotFound();
             }
-
-            return recipe;
+            RecipeDTO recipeDTO = mapper.Map<Recipe, RecipeDTO>(recipe);
+            return recipeDTO;
         }
 
         // PUT: api/Recipes/5
@@ -80,7 +91,7 @@ namespace API.Controllers
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRecipe", new { id = recipe.RecipeId }, recipe);
+            return recipe;
         }
 
         // DELETE: api/Recipes/5
@@ -103,5 +114,6 @@ namespace API.Controllers
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
+
     }
 }

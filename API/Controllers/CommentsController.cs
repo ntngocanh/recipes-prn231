@@ -56,7 +56,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId && x.ParentCommentId == null && x.CommentStatus== CommentStatus.Posted).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId && x.ParentCommentId == null && x.CommentStatus != CommentStatus.Hidden).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -76,7 +76,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.ParentCommentId == commentId && x.CommentStatus == CommentStatus.Posted).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.ParentCommentId == commentId && x.CommentStatus != CommentStatus.Hidden).ToList();
             if (comments == null)
             {
                 return NotFound();

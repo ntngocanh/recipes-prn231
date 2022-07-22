@@ -4,6 +4,7 @@ using BusinessObjects.DTO;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -55,7 +56,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId && x.ParentCommentId == null).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId && x.ParentCommentId == null && x.CommentStatus== CommentStatus.Posted).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -75,7 +76,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.ParentCommentId == commentId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.ParentCommentId == commentId && x.CommentStatus == CommentStatus.Posted).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -93,11 +94,20 @@ namespace API.Controllers
         {
             /*try
             {*/
-            Comment c = mapper.Map<CommentRequest, Comment>(comment);
+                
+                Comment c = mapper.Map<CommentRequest, Comment>(comment);
+                if (comment.ParentCommentId == 0)
+                {
+                c.ParentComment = null;
+                }
                 _context.Comments.Add(c);
                 await _context.SaveChangesAsync();
-                return Ok();
-           /* } catch (Exception)
+                int id = c.CommentId;
+                Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == id);
+                CommentDTO commentDTO = mapper.Map<Comment, CommentDTO>(c1);
+                return Ok(commentDTO);
+            /*}
+            catch (Exception)
             {
                 return BadRequest();
             }*/

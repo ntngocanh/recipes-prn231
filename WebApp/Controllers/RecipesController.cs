@@ -17,12 +17,16 @@ namespace WebApp.Controllers
     {
         private readonly HttpClient client = null;
         private string RecipesApiUrl = "";
+        private string CommentApiUrl = "";
+
+
         public RecipesController()
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
+            CommentApiUrl = "https://localhost:5001/api/Comments";
         }
         public IActionResult Index()
         {
@@ -37,6 +41,10 @@ namespace WebApp.Controllers
                 PropertyNameCaseInsensitive = true
             };
             RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
+            response = await client.GetAsync(CommentApiUrl + "/getByRecipeBase/" + id);
+            string strData2 = await response.Content.ReadAsStringAsync();
+            List<CommentDTO> comments = JsonSerializer.Deserialize<List<CommentDTO>>(strData2, options);
+            ViewBag.Comments = comments;
             return View(recipe);
         }
         //public async Task<IActionResult> Create()

@@ -17,10 +17,10 @@
             <div class="section">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <input type="file" asp-for="Image" accept="image/*" onchange="previewFile()" />
+                    <input type="file" asp-for="Image" accept="image/*" id="input-recipe-image" />
                 </div>
                 <div class="fill">
-                    <img src="~/images/@Model.Image" height="200" alt="Image preview..." id="recipeImage">
+                    <img src="~/images/@Model.Image" height="200" alt="Image preview..." id="recipe-image">
                 </div>
                 <div class="form-group">
                     <input asp-for="Name" class="form-control" id="nameBox" placeholder="Tên món: Bánh bột mì" />
@@ -35,7 +35,7 @@
                         <label asp-for="Duration" class="control-label"></label>
                     </div>
                     <div class="col-6">
-                        <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" />
+                        <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" id="durationBox"/>
                         <span asp-validation-for="Duration" class="text-danger"></span>
                     </div>
                 </div>
@@ -92,42 +92,137 @@
                                     }
                                 </td>
                             </tr>
-            }
-                        </tbody>
-                        </table>
-                        <div class="center">
-                            <span id="addStepBtn" class="clickable">+ Bước làm</span>
-                        </div>
-</div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                        }
+                    </tbody>
+                </table>
+                <div class="center">
+                    <span id="addStepBtn" class="clickable">+ Bước làm</span>
+                </div>
             </div>
             <div>
-                <a asp-action="Index">Back to List</a>
+                <a asp-action="Details" asp-route-id="@Model.RecipeId">Back to Recipe Details</a>
             </div>
         </form>
     </div>
     <div class="col-md-2"></div>
 </div>
 
-<script>
-    function previewFile() {
-                            var preview = document.querySelector('img');
-                            var file = document.querySelector('input[type=file]').files[0];
-                            var reader = new FileReader();
-
-                            reader.onloadend = function () {
-                                preview.src = reader.result;
-                            }
-
-                            if (file) {
-                                reader.readAsDataURL(file);
-                            } else {
-                                preview.src = "";
-                            }
-                        }
-</script>
 <script type="text/javascript">
+    //when user uploads a new image for the recipe
+    $("#input-recipe-image").change(function () {
+        //show preview images
+        var preview = document.getElementById('recipe-image');
+        var file = document.getElementById("input-recipe-image").files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+        //save file to images folder
+        var formData = new FormData();
+        formData.append("input-recipe-image", file);
+
+        $.ajax({
+            type: "POST",
+            url: '/Recipes/UploadRecipeImage',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                imageChanged(response);
+            },
+            error: function (error) {
+                alert("error: " + error);
+            }
+        });
+    });
+    //recipe information changed
+
+    $(document).on("change", '#nameBox', function() {
+        console.log("name changed");
+        $.ajax({
+            url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "name",
+                "value": $(this).val()
+            }]),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+    //description changed
+    $(document).on("change", '#descriptionBox', function() {
+        console.log("name changed");
+        $.ajax({
+            url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "description",
+                "value": $(this).val()
+            }]),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+    //image changed
+    function imageChanged(newUrl) {
+        $.ajax({
+            url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "image",
+                "value": newUrl
+            }]),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    }
+    //duration changed
+    $(document).on("change", '#durationBox', function() {
+        $.ajax({
+            url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "duration",
+                "value": $(this).val()
+            }]),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+    //when user clicks delete an ingredient
     $(document).on("click", '[id^="del-ingre-"]', function () {
         var id = $(this).attr("id").replace("del-ingre-", "");
         if (confirm("Do you really want to delete this ingredient?")) {

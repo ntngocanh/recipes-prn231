@@ -10,6 +10,7 @@ using AutoMapper;
 using API.DTO;
 using BusinessObjects.Models;
 using BusinessObjects.DTO;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace API.Controllers
 {
@@ -127,6 +128,21 @@ namespace API.Controllers
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
+        }
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Recipe> patchEntity)
+        {
+            var entity = _context.Recipes.FirstOrDefault(r => r.RecipeId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return Ok(entity);
         }
 
     }

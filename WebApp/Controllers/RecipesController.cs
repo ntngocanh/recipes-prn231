@@ -1,15 +1,18 @@
 ﻿using BusinessObjects.DTO;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WebApp.Models;
 
 namespace WebApp.Controllers
 {
@@ -17,12 +20,14 @@ namespace WebApp.Controllers
     {
         private readonly HttpClient client = null;
         private string RecipesApiUrl = "";
+        private string IngredientsApiUrl = "";
         public RecipesController()
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
+            IngredientsApiUrl = "https://localhost:5001/api/Ingredients";
         }
         public IActionResult Index()
         {
@@ -87,5 +92,61 @@ namespace WebApp.Controllers
             RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
             return View(recipe);
         }
+        [HttpPost]
+        public JsonResult UploadRecipeImage([FromServices] IHostingEnvironment hostingEnvironment)
+        {
+            string uniqueFileName = null;
+            if (Request.Form.Files.Count != 0)
+            {
+                var image = Request.Form.Files[0];
+
+                string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images");
+
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+
+                using (var fs = new FileStream(Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create))
+                {
+                    image.CopyToAsync(fs);
+                }
+            }
+            return Json(uniqueFileName);
+        }
+        //[HttpPost]
+        //public JsonResult UploadStepImage(int stepId, string text, IFormFile image, [FromServices] IHostingEnvironment hostingEnvironment)
+        //{
+        //    string uniqueFileName = null;
+        //    if (image != null)
+        //    {
+        //        string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images");
+        //        uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+        //        using (var fs = new FileStream(Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create))
+        //        {
+        //            image.CopyToAsync(fs);
+        //        }
+        //    }
+        //    Step step = new Step
+        //    {
+        //        StepId = stepId,
+        //        Text = text,
+        //        Image = uniqueFileName
+        //    };
+        //    string token = "";
+        //    if (HttpContext.Session.Get("token") != null)
+        //    {
+        //        token = HttpContext.Session.GetString("token");
+        //    }
+        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        //    var json = JsonSerializer.Serialize(step);
+        //    var data = new StringContent(json, Encoding.UTF8, "application/json");
+        //    HttpResponseMessage response =  client.PatchAsync(IngredientsApiUrl + "/" + stepId, data);
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        return Json(step);
+        //    }
+        //    else
+        //    {
+        //        return Json(step);
+        //    }
+        //}
     }
 }

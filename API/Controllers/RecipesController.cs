@@ -49,6 +49,23 @@ namespace API.Controllers
             return Ok(list);
           
         }
+        [HttpGet("Statistic/{startDate}/{endDate}")]
+
+        public ActionResult GetRecipesByDays(DateTime startDate,DateTime endDate)
+        {
+            DateTime date = startDate;
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            foreach (DateTime day in EachDay(startDate, endDate)) {
+                var num = _context.Recipes.Where(x => x.DateCreated == day).ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(day.ToString("yyyy-MM-dd")), number));
+            }
+              
+            return Ok(list);
+
+        }
         // GET: api/Recipes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)
@@ -142,6 +159,11 @@ namespace API.Controllers
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
+        }
+        private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+        {
+            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+                yield return day;
         }
 
     }

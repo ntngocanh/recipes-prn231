@@ -6,46 +6,132 @@
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
 <div class="container">
-    
-    <input id="startDate" type="date">
-    <input id="endDate" type="date">
+
+    <label>Start Date:&nbsp&nbsp&nbsp&nbsp&nbsp</label><input id="startDate" type="date">
+    <br />
+    <label>End Date:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp     </label><input id="endDate" type="date">
 
     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <br>
+    <br>
     <div id="PiechartContainer" style="height: 370px; width: 100%;"></div>
 </div>
+<script>
+    const previous = new Date();
+    previous.setDate(new Date().getDate() - 6);
+    document.getElementById('endDate').valueAsDate = new Date();
+    document.getElementById('endDate').max = new Date().toISOString().split("T")[0];
+    document.getElementById('startDate').max = new Date().toISOString().split("T")[0];
 
+    document.getElementById('startDate').valueAsDate = previous;
+</script>
 <script>
     $(document).ready(function () {
+
+        Date.prototype.toDateInputValue = (function () {
+            var local = new Date(this);
+            local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+            return local.toJSON().slice(0, 10);
+        });
+        console.log(document.getElementById('startDate').valueAsDate.toLocaleString().Date);
         $.noConflict();
-        var dataPoints = [];
+        $("#startDate").change(function () {
+            
+            $("#chartContainer").CanvasJSChart().destroy();
+            var date = new Date($('#startDate').val());
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            let start = month + "-" + day + "-" + year;
+            var date = new Date($('#endDate').val());
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            let end = month + "-" + day + "-" + year;
+            
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/Statistic/" + start + "/" +end,
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+
+                   
+                    addData(result);
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        });
+        $("#endtDate").change(function () {
+
+            $("#chartContainer").CanvasJSChart().destroy();
+            var date = new Date($('#startDate').val());
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            let start = month + "-" + day + "-" + year;
+            var date = new Date($('#endDate').val());
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+            let end = month + "-" + day + "-" + year;
+
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/Statistic/" + start + "/" + end,
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+
+
+                    addData(result);
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        });
+        
         var PieData = [];
-        var options = {
-            animationEnabled: true,
-            theme: "light2",
-            title: {
-                text: "Daily Sales Data"
-            },
-            axisX: {
-                valueFormatString: "DD MMM YYYY",
-            },
-            axisY: {
-                title: "USD",
-                titleFontSize: 24
-            },
-            data: [{
-                type: "spline",
-                yValueFormatString: "$#,###.##",
-                dataPoints: dataPoints
-            }]
-        };
+        
 
         function addData(data) {
+            let dataPoints = [];
             for (let i = 0; i < data.length; i++) {
                 dataPoints.push({
                     x: new Date(data[i].date),
                     y: data[i].numberOfRecipe
                 });
             }
+            console.log(dataPoints.length);
+            let options = {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Numbers of recipes created"
+                },
+                axisX: {
+                    valueFormatString: "DD MMM YYYY",
+                    intervalType: "day",
+                    interval: 1
+                    
+                },
+                axisY: {
+                   
+                    titleFontSize: 24
+                },
+                data: [{
+                    type: "spline",
+                    yValueFormatString: "$#,###.##",
+                    dataPoints: dataPoints
+                }]
+            };
             $("#chartContainer").CanvasJSChart(options);
 
         }
@@ -64,10 +150,10 @@
         $.getJSON("https://localhost:5001/api/Users/Statistic", addDataPie);
         var Pieoptions = {
             title: {
-                text: "Desktop OS Market Share in 2017"
+                text: "Percentage of user role"
             },
             subtitles: [{
-                text: "As of November, 2017"
+                text: ""
             }],
             animationEnabled: true,
             data: [{

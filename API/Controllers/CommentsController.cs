@@ -113,7 +113,18 @@ namespace API.Controllers
             }*/
 
         }
+        [HttpPost("reportComment/{commentId}")]
+        public async Task<IActionResult> ReportComment(Report report)
+        {
+            _context.Reports.Add(report);
+            await _context.SaveChangesAsync();
+            //Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == report.CommentId);
+            //c1.CommentStatus = CommentStatus.Reported;
+            //_context.Comments.Update(c1);
+            //await _context.SaveChangesAsync();
+            return Ok();
 
+        }
         [HttpPut]
         public IActionResult EditComment(Comment comment)
         {

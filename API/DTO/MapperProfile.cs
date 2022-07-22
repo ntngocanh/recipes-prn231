@@ -18,6 +18,7 @@ namespace API.DTO
             CreateMap<Step, StepDTO>();
             CreateMap<Comment, CommentDTO>();
             CreateMap<CommentRequest, Comment>();
+            CreateMap<Collection, CollectionDTO>();
 
         }
     }

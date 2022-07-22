@@ -4,6 +4,7 @@ using BusinessObjects.DTO;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -55,7 +56,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.RecipeId == recipeId && x.ParentCommentId == null).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.RecipeId == recipeId && x.ParentCommentId == null && x.CommentStatus != CommentStatus.Hidden).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -75,7 +76,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            List<Comment> comments = _context.Comments.Where(x => x.ParentCommentId == commentId).ToList();
+            List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.ParentCommentId == commentId && x.CommentStatus != CommentStatus.Hidden).ToList();
             if (comments == null)
             {
                 return NotFound();
@@ -93,23 +94,43 @@ namespace API.Controllers
         {
             /*try
             {*/
+
             Comment c = mapper.Map<CommentRequest, Comment>(comment);
-                _context.Comments.Add(c);
-                await _context.SaveChangesAsync();
-                return Ok();
-           /* } catch (Exception)
+            if (comment.ParentCommentId == 0)
+            {
+                c.ParentComment = null;
+            }
+            _context.Comments.Add(c);
+            await _context.SaveChangesAsync();
+            int id = c.CommentId;
+            Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == id);
+            CommentDTO commentDTO = mapper.Map<Comment, CommentDTO>(c1);
+            return Ok(commentDTO);
+            /*}
+            catch (Exception)
             {
                 return BadRequest();
             }*/
 
         }
+        [HttpPost("reportComment/{commentId}")]
+        public async Task<IActionResult> ReportComment(Report report)
+        {
+            _context.Reports.Add(report);
+            await _context.SaveChangesAsync();
+            //Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == report.CommentId);
+            //c1.CommentStatus = CommentStatus.Reported;
+            //_context.Comments.Update(c1);
+            //await _context.SaveChangesAsync();
+            return Ok();
 
-        [HttpPut]
-        public IActionResult EditComment(Comment comment)
+        }
+        [HttpPut("{commentId}")]
+        public IActionResult EditComment(CommentRequest comment, int commentId)
         {
             try
             {
-                Comment c = _context.Comments.FirstOrDefault(x => x.CommentId == comment.CommentId);
+                Comment c = _context.Comments.FirstOrDefault(x => x.CommentId == commentId);
                 if (c == null)
                 {
                     return NotFound();
@@ -134,7 +155,7 @@ namespace API.Controllers
                 {
                     return NotFound();
                 }
-                _context.Comments.Remove(c);
+                c.CommentStatus = CommentStatus.Hidden;
                 _context.SaveChanges();
                 return Ok();
             }

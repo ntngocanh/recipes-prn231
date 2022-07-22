@@ -31,6 +31,7 @@ namespace BusinessObjects.Models
         public virtual DbSet<Reaction> Reactions { get; set; }
         public virtual DbSet<Recipe> Recipes { get; set; }
         public virtual DbSet<FeaturedTag> FeaturedTags { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Reaction>().HasKey(r => new { r.UserId, r.RecipeId });
@@ -38,6 +39,7 @@ namespace BusinessObjects.Models
             modelBuilder.Entity<CollectionRecipe>().HasOne(cr => cr.Collection).WithMany(c => c.CollectionRecipes).OnDelete(DeleteBehavior.ClientCascade);
             modelBuilder.Entity<Comment>().HasOne(c => c.Recipe).WithMany(c => c.Comments).OnDelete(DeleteBehavior.ClientCascade);
             modelBuilder.Entity<Reaction>().HasOne(c => c.Recipe).WithMany(c => c.Reactions).OnDelete(DeleteBehavior.ClientCascade);
+            modelBuilder.Entity<Report>().HasOne(c => c.Comment).WithMany(c => c.Reports).OnDelete(DeleteBehavior.ClientCascade);
 
         }
     }

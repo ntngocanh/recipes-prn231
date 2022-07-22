@@ -9,6 +9,6 @@ namespace BusinessObjects.Models
     {
         Heart,
         Yummy,
-        Like
+        Clap
     }
 }

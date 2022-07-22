@@ -13,6 +13,7 @@ namespace BusinessObjects.Models
         public int UserId { get; set; }
         [Key, Column(Order = 1)]
         public int RecipeId { get; set; }
+        public ReactionType ReactionType { get; set; }
         public virtual User User { get; set; }
         public virtual Recipe Recipe { get; set; }
     }

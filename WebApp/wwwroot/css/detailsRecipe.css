@@ -110,3 +110,12 @@ input {
 .replies-section{
     margin-top: 0.5rem;
 }
+
+.delCmt, .editCmt, .reportCmt {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.dropdown-section {
+    padding-top: 15px;
+}

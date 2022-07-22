@@ -11,7 +11,7 @@ namespace BusinessObjects.DTO
     {
         public int UserId { get; set; }
         public int RecipeId { get; set; }
-        public int ParentCommentId { get; set; }
+        public int? ParentCommentId { get; set; }
         public string Text { get; set; }
         public CommentStatus CommentStatus { get; set; }
     }

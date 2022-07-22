@@ -94,11 +94,20 @@ namespace API.Controllers
         {
             /*try
             {*/
-            Comment c = mapper.Map<CommentRequest, Comment>(comment);
+                
+                Comment c = mapper.Map<CommentRequest, Comment>(comment);
+                if (comment.ParentCommentId == 0)
+                {
+                c.ParentComment = null;
+                }
                 _context.Comments.Add(c);
                 await _context.SaveChangesAsync();
-                return Ok();
-           /* } catch (Exception)
+                int id = c.CommentId;
+                Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == id);
+                CommentDTO commentDTO = mapper.Map<Comment, CommentDTO>(c1);
+                return Ok(commentDTO);
+            /*}
+            catch (Exception)
             {
                 return BadRequest();
             }*/

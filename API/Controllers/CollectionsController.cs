@@ -51,7 +51,7 @@ namespace API.Controllers
 
 //Get All Recipes of Collection
 
-        [HttpGet("getRecipes/{collectionId}")]
+        [HttpGet("GetRecipes/{collectionId}")]
         public IActionResult GetRecipesByCollection(int collectionId)
         {
             if (_context.Collections.FirstOrDefault(x => x.CollectionId == collectionId) == null)
@@ -84,6 +84,7 @@ namespace API.Controllers
                 return NotFound();
             }
             CollectionDTO collectionDTO = mapper.Map<Collection, CollectionDTO>(c);
+            collectionDTO.NumberOfRecipes = CountRecipes(collectionId);
             return Ok(collectionDTO);
         }
 
@@ -141,6 +142,23 @@ namespace API.Controllers
             }
 
             _context.Collections.Remove(collection);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        //Delete CollectionRecipe
+
+        [HttpDelete("DeleteCR/{collectionId}/{recipeId}")]
+        public async Task<IActionResult> DeleteCollectionRecipe(int collectionId, int recipeId)
+        {
+            CollectionRecipe cr = await _context.CollectionRecipes.FirstOrDefaultAsync(x => x.CollectionId == collectionId && x.RecipeId == recipeId);
+            if (cr == null)
+            {
+                return NotFound();
+            }
+
+            _context.CollectionRecipes.Remove(cr);
             await _context.SaveChangesAsync();
 
             return NoContent();

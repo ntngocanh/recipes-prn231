@@ -20,5 +20,6 @@ namespace BusinessObjects.Models
         public virtual Recipe Recipe { get; set; }
         public string Text { get; set; }
         public CommentStatus CommentStatus { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@model BusinessObjects.DTO.RecipeDTO
+@using Microsoft.AspNetCore.Http;
 
 @{
     ViewData["Title"] = "Details";
@@ -77,51 +78,69 @@
 
                 @foreach (var comment in ViewBag.Comments)
                 {
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-lg-10">
-                                    <div class="d-flex px-3 py-4">
-                                        <div class="flex-shrink-0">
-                                            <div class="avatar avatar-sm rounded-circle">
-                                                <img class="avatar-img" src="/images/@comment.User.Avatar" alt="">
-                                            </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-10">
+                                <div class="d-flex px-3 py-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="avatar avatar-sm rounded-circle">
+                                            <img class="avatar-img" src="/images/@comment.User.Avatar" alt="">
                                         </div>
-                                        <div class="ms-2 ms-md-8 comment-content">
-                                            <div class="d-flex align-items-baseline">
-                                                <h6 class="me-2">@comment.User.Name</h6>
-                                            </div>
-                                            <div class="commentId">@comment.CommentId</div>
-                                            <div>@comment.Text</div>
-                                            <div>
-                                                <a href="#/" class="reply">Reply</a>
-                                            </div>
-                                            @if (comment.NumberOfReplies > 0)
-                                            {
-                                                <div>
-                                                    <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show @comment.NumberOfReplies replies</b></a>
-                                                </div>
-                                                <div class="replies-section"></div>
-                                            }
-                                            
-                                        </div>
-                                        
                                     </div>
-                                </div>
-                                <div class="col-lg-2 dropdown-section">
-                                    <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <div class="delCmt" id="del-comment-@comment.CommentId">Xóa bình luận</div>
-                                        <div class="editCmt" id="edit-comment-@comment.CommentId">Sửa bình luận</div>
-                                        <div class="reportCmt" id="report-comment-@comment.CommentId">Báo cáo bình luận</div>
+                                    <div class="ms-2 ms-md-8 comment-content">
+                                        <div class="d-flex align-items-baseline">
+                                            <h6 class="me-2">@comment.User.Name</h6>
+                                        </div>
+                                        <div class="commentId">@comment.CommentId</div>
+                                        <div id="comment-content-@comment.CommentId">@comment.Text</div>
+                                        <div>
+                                            <a href="#/" id="reply-btn-@comment.CommentId" class="reply">Reply</a>
+                                        </div>
+                                        @if (comment.NumberOfReplies > 0)
+                                        {
+                                            <div>
+                                                <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show @comment.NumberOfReplies replies</b></a>
+                                            </div>
+                                            <div class="replies-section"></div>
+                                        }
 
                                     </div>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-2 dropdown-section">
+                                <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    @if ((int)ViewData["userId"] == comment.User.UserId)
+                                    {
+                                        <div class="delCmt" id="del-comment-@comment.CommentId">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-@comment.CommentId">Sửa bình luận</div>
+                                    }
+
+                                    <div class="reportCmt" id="report-comment-@comment.CommentId">Báo cáo bình luận</div>
+
                                 </div>
                             </div>
                         </div>
+                    </div>
                 }
             </div>
 
         </div>
+            <div class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p>Báo cáo comment này?</p>
+                    <input type="number" class="reportCommentIdTxt" id="reportCommentId" style="display:none">
+                    <div class="form-group">
+                        <label for="Title">Hãy nêu lí do tại sao bạn báo cáo comment này.</label>
+                        <input type="text" name="" id="reportText" class="form-control">
+                    </div>
+                    <div class="text-center panel-body">
+                        <button type="submit" class="btn btn-sm btn-primary" id="ReportButton">Báo cáo comment</button>
+                    </div>
+                </div>
+            </div>
     </div>
     <div class="col-md-2">
         <div style="display:none" id="recipe-id">@Model.RecipeId</div>
@@ -141,11 +160,27 @@
         console.log("clicked");
         $("#ingredientsTable").append('<tr><td><input type = "text" placeholder = "250g bột" class="form-control"/></td ><td><span class="clickable">...</span></td></tr>');
     });
-    
+
 </script>
 @section Scripts {
     <script type="text/javascript">
+        $(document).on("click", '[id^="del-comment-"]', function () {
+            var comment = $(this).closest(".row");
+            if (confirm("Bạn có chắc chắn muốn xóa bình luận này?") == true) {
+                $.ajax({
+                    url: "https://localhost:5001/api/Comments/" + $(this).attr("id").replace("del-comment-", ""),
+                    method: 'delete',
+                    contentType: "application/json",
+                    success: function (result, status, xhr) {
+                        $(comment).hide();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+            }
 
+        });
 
         $(".show-replies").on("click", function () {
             var repliesSection = $(this).parent().next();
@@ -157,37 +192,52 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (result, status, xhr) {
                     $.each(result, function (index, value) {
-                        htmlContent += `
-                                                <div class="d-flex">
-                                                    <div class="flex-shrink-0">
-                                                        <div class="avatar avatar-sm rounded-circle">
-                                                            <img class="avatar-img" src="/images/` + value["user"]["avatar"] + `" alt="">
+                        htmlContent += `<div class="row"><div class="col-lg-10">
+                                                    <div class="d-flex">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="avatar avatar-sm rounded-circle">
+                                                                <img class="avatar-img" src="/images/` + value["user"]["avatar"] + `" alt="">
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 comment-content">
-                                                        <div class="d-flex align-items-baseline">
-                                                            <h6 class="me-2">` + value["user"]["name"] + `</h6>
-                                                        </div>
-                                            <div class="commentId">` + value["commentId"] + `</div>
+                                                        <div class="flex-grow-1 comment-content">
+                                                            <div class="d-flex align-items-baseline">
+                                                                <h6 class="me-2">` + value["user"]["name"] + `</h6>
+                                                            </div>
+                                                <div class="commentId">` + value["commentId"] + `</div>
 
-                                                        <div>` +
+                                                            <div id="comment-content-` + value["commentId"] + `">` +
                             value["text"]
                             + `</div>
 <div>
-                                                    <a href="#/" class="reply">Reply</a>`;
+                                                        <a href="#/" class="reply">Reply</a>`;
                         if (result["numberOfReplies"] > 0) {
                             htmlContent += `<div>
 
-                                                        <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show ` + result["numberOfReplies"] + ` replies</b></a>
+                                                            <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show ` + result["numberOfReplies"] + ` replies</b></a>
 
-                                                        </div>
-                                                        <div class="replies-section"></div>`
+                                                            </div>
+                                                            <div class="replies-section"></div>`
                         }
 
                         htmlContent += `
-                                                </div>
                                                     </div>
-                                                </div>`;
+                                                        </div></div>
+                                                    </div>
+                                        <div class="col-lg-2 dropdown-section">
+                                <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">`;
+                                    if ('@ViewData["userId"]' == value["user"]["userId"])
+                                    {
+                                        htmlContent +=
+                                        `<div class="delCmt" id="del-comment-` + value["commentId"] +`">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + value["commentId"] +`">Sửa bình luận</div>`
+                                    }
+
+                    htmlContent +=  `<div class="reportCmt" id="report-comment-` + value["commentId"] +`">Báo cáo bình luận</div>
+
+                                </div>
+                            </div>
+                                                    </div>`;
                         $("<div>").addClass("container").html(htmlContent);
                         repliesSection.html(htmlContent);
                     });
@@ -219,37 +269,179 @@
                     data: JSON.stringify(json),
                     success: function (result, status, xhr) {
                         htmlContent += `<div class="row">
-                                    <div class="col-lg-12">
+                                        <div class="col-lg-10">
 
-                                            <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
-                                                    <div class="flex-shrink-0">
-                                                        <div class="avatar avatar-sm rounded-circle">
-                                                            <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="avatar avatar-sm rounded-circle">
+                                                                <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 comment-content">
-                                                        <div class="d-flex align-items-baseline">
-                                                            <h6 class="me-2">` + result["user"]["name"] + `</h6>
-                                                        </div>
-                                                        <div class="commentId">` + value["commentId"] + `</div>
-                                                        <div>` +
+                                                        <div class="flex-grow-1 comment-content">
+                                                            <div class="d-flex align-items-baseline">
+                                                                <h6 class="me-2">` + result["user"]["name"] + `</h6>
+                                                            </div>
+                                                            <div class="commentId">` + result["commentId"] + `</div>
+                                                            <div>` +
                             result["text"]
                             + `</div>
 <div>
-                                                    <a href="#" class="reply">Reply</a>
-                                            </div>
-                                                        </div> </div></div>
-                                                    </div>`;
-                            $("<div>").addClass("container").html(htmlContent).appendTo($("#comment-section"));
-                        },
-                        error: function (xhr, status, error) {
-                            console.log(xhr);
-                        }
-                    });
-                    $(this).parent().find("div:nth-child(2)").find(":first-child").val("");
-                }
+                                                        <a href="#" class="reply">Reply</a>
+                                                </div>
+                                                            </div> </div></div>
+                                    <div class="col-lg-2 dropdown-section">
+                                <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="delCmt" id="del-comment-` + value["commentId"] + `">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + value["commentId"] +`">Sửa bình luận</div>
+                                        <div class="reportCmt" id="report-comment-` + value["commentId"] +`">Báo cáo bình luận</div>
 
+                                </div>
+                            </div>
+                                                        </div>`;
+                        $("<div>").addClass("container").html(htmlContent).appendTo($("#comment-section"));
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+                $(this).parent().find("div:nth-child(2)").find(":first-child").val("");
+            }
+
+        });
+
+
+        var commentContent;
+        $(document).on("click", '[id^="edit-comment-"]', function () {
+            var id = $(this).attr("id").replace("edit-comment-", "");
+            var commentBox = $("#comment-content-" + id);
+            commentContent = $("#comment-content-" + id).text();
+            var htmlContent = `<div class="row flex-row align-items-center" id="comment-box">
+                
+                <div class="">
+                    <textarea rows="1" id="comment-input-` + id+ `" class="comment-input textarea form-rounded" role="textbox" contenteditable>` + $("#comment-content-" + id).text() + `</textarea>
+                </div>
+                <button id="comment-edit-`+ id +`" class="comment-post-btn float-left btn" type="button">Post</button>
+                <button id="comment-cancel-`+ id +`" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
+            </div>`;
+            commentBox.html(htmlContent);
+            
+        });
+
+        $(document).on("click", '[id^="comment-edit-"]', function () {
+            var id = $(this).attr("id").replace("comment-edit-", "");
+            var textContent = $("#comment-input-" + id).val();
+            var json = {
+                text: $("#comment-input-" + id).val(),
+            };
+            var commentBox = $("#comment-content-" + id);
+
+            $.ajax({
+                url: "https://localhost:5001/api/Comments/" + id,
+                method: "put",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (result, status, xhr) {
+                    commentBox.html(textContent);
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
             });
+        });
+
+        $(document).on("click", '[id^="comment-cancel-"]', function () {
+            console.log("click");
+            var id = $(this).attr("id").replace("comment-cancel-", "");
+            var commentBox = $("#comment-content-" + id);
+
+            commentBox.html(commentContent);
+        });
+
+            
+
+        $(document).ready(function () {
+          var commentidtxt = $('.reportCommentIdTxt');
+          var modal = $('.modal');
+          var btn = $('.reportCmt');
+          var span = $('.close');
+          var commentid = btn.attr("id").replace("report-comment-", "");
+
+          $("#reportCommentId").val(commentid);
+
+          btn.click(function () {
+            modal.show();
+          });
+
+          span.click(function () {
+            modal.hide();
+          });
+
+          $(window).on('click', function (e) {
+            if ($(e.target).is('.modal')) {
+              modal.hide();
+            }
+          });
+        });
+        $("#ReportButton").click(function(e) {
+            data = new FormData();
+            data.append("CommentId", $("#reportCommentId").val());
+            data.append("Text", $("#reportText").val());
+            var object = {};
+            data.forEach((value, key) => object[key] = value);
+            console.log(JSON.stringify(object))
+            $.ajax({
+                url: "https://localhost:5001/api/Comments/reportComment" + "/" + $("#reportCommentId").val(),
+                type: "post",
+                data: JSON.stringify(object),
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    console.log(status);
+                    var modal = $('.modal');
+                    modal.hide();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        });
     </script>
+    <style>
+          .modal {
+          display: none;
+          position: fixed;
+          z-index: 1;
+          padding-top: 100px;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgb(0, 0, 0);
+          background-color: rgba(0, 0, 0, .4);
+        }
+
+        .modal-content {
+          background-color: #fefefe;
+          margin: auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+        }
+
+        .close {
+          color: #aaaaaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+    </style>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

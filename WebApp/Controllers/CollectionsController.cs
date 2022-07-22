@@ -13,41 +13,47 @@ using System.Threading.Tasks;
 
 namespace WebApp.Controllers
 {
-    public class RecipesController : Controller
+    public class CollectionsController : Controller
     {
         private readonly HttpClient client = null;
         private string RecipesApiUrl = "";
-        private string CommentApiUrl = "";
+        private string CollectionApiUrl = "";
 
 
-        public RecipesController()
+        public CollectionsController()
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
-            CommentApiUrl = "https://localhost:5001/api/Comments";
+            CollectionApiUrl = "https://localhost:5001/api/Collections";
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
-        public async Task<IActionResult> Details(int id)
-        {
-            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
-            ViewData["userId"] = user.UserId;
-            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
+            int UserId = SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId;
+            HttpResponseMessage response = await client.GetAsync(CollectionApiUrl + "/getByUser/" + UserId);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-            RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
-            response = await client.GetAsync(CommentApiUrl + "/getByRecipeBase/" + id);
+            List<CollectionDTO> collections = JsonSerializer.Deserialize<List<CollectionDTO>>(strData, options);
+            return View(collections);
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync(CollectionApiUrl + "/" + id);
+            string strData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            CollectionDTO collection = JsonSerializer.Deserialize<CollectionDTO>(strData, options);
+            response = await client.GetAsync(CollectionApiUrl + "/GetRecipes/" + id);
             string strData2 = await response.Content.ReadAsStringAsync();
-            List<CommentDTO> comments = JsonSerializer.Deserialize<List<CommentDTO>>(strData2, options);
-            ViewBag.Comments = comments;
-            return View(recipe);
+            List<RecipeDTO> recipes = JsonSerializer.Deserialize<List<RecipeDTO>>(strData2, options);
+            ViewBag.Recipes = recipes;
+            return View(collection);
         }
         //public async Task<IActionResult> Create()
         //{
@@ -55,11 +61,9 @@ namespace WebApp.Controllers
         //}
         public async Task<IActionResult> Create()
         {
-            Recipe recipe = new Recipe()
+            Collection collection = new Collection()
             {
-                UserId = SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId,
-                DateCreated = DateTime.Now,
-                RecipeStatus = RecipeStatus.Draft
+                UserId = SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId
             };
             string token = "";
             if (HttpContext.Session.Get("token") != null)
@@ -67,7 +71,7 @@ namespace WebApp.Controllers
                 token = HttpContext.Session.GetString("token");
             }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var json = JsonSerializer.Serialize(recipe);
+            var json = JsonSerializer.Serialize(collection);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(RecipesApiUrl, data);
 
@@ -78,8 +82,8 @@ namespace WebApp.Controllers
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                Recipe r = JsonSerializer.Deserialize<Recipe>(result, options);
-                return RedirectToAction("Edit",  "Recipes", new { id = r.RecipeId.ToString() });
+                Collection c = JsonSerializer.Deserialize<Collection>(result, options);
+                return RedirectToAction("Edit", "Collections", new { id = c.CollectionId.ToString() });
             }
             else
             {
@@ -88,14 +92,14 @@ namespace WebApp.Controllers
         }
         public async Task<IActionResult> Edit(int id)
         {
-            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
+            HttpResponseMessage response = await client.GetAsync(CollectionApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-            RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
-            return View(recipe);
+            CollectionDTO collection = JsonSerializer.Deserialize<CollectionDTO>(strData, options);
+            return View(collection);
         }
     }
 }

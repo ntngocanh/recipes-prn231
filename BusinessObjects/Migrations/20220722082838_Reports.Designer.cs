@@ -4,14 +4,16 @@ using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BusinessObjects.Migrations
 {
     [DbContext(typeof(RecipeDbContext))]
-    partial class RecipeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220722082838_Reports")]
+    partial class Reports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,9 +159,6 @@ namespace BusinessObjects.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReactionType")
                         .HasColumnType("int");
 
                     b.HasKey("UserId", "RecipeId");
@@ -328,7 +327,7 @@ namespace BusinessObjects.Migrations
                 {
                     b.HasOne("BusinessObjects.Models.Comment", "ParentComment")
                         .WithMany()
-                        .HasForeignKey("ParentCommentId").OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ParentCommentId");
 
                     b.HasOne("BusinessObjects.Models.Recipe", "Recipe")
                         .WithMany("Comments")

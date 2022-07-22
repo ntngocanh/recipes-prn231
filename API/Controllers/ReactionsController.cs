@@ -11,5 +11,6 @@ namespace API.Controllers
     [ApiController]
     public class ReactionsController : ControllerBase
     {
+
     }
 }

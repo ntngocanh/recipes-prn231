@@ -155,7 +155,7 @@ namespace API.Controllers
                 {
                     return NotFound();
                 }
-                _context.Comments.Remove(c);
+                c.CommentStatus = CommentStatus.Hidden;
                 _context.SaveChanges();
                 return Ok();
             }

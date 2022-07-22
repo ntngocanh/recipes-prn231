@@ -97,16 +97,13 @@ namespace API.Controllers
 
         //Add Recipe to Collection
 
-        [HttpPost("addToCollection/{collectionId}")]
-        public async Task<ActionResult<Recipe>> PostToCollection(int collectionId, Recipe recipe)
+        [HttpPost("addToCollection")]
+        public async Task<ActionResult<Recipe>> PostToCollection(CollectionRecipe cr)
         {
-            CollectionRecipe cr = new CollectionRecipe();
-            cr.CollectionId = collectionId;
-            cr.RecipeId = recipe.RecipeId;
             _context.CollectionRecipes.Add(cr);
             await _context.SaveChangesAsync();
 
-            return recipe;
+            return Ok();
         }
 
         // DELETE: api/Recipes/5

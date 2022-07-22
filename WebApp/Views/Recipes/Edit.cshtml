@@ -35,7 +35,7 @@
                         <label asp-for="Duration" class="control-label"></label>
                     </div>
                     <div class="col-6">
-                        <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" id="durationBox"/>
+                        <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" id="durationBox" />
                         <span asp-validation-for="Duration" class="text-danger"></span>
                     </div>
                 </div>
@@ -88,8 +88,9 @@
                                     }
                                     else
                                     {
-                                        <img class="step-img-null" src="~/images/camera.jpg" id="img-step-null-@item.StepId" />
+                                        <img class="step-img-null" src="~/images/camera.jpg" id="img-step-@item.StepId" />
                                     }
+                                    <input type="file" asp-for="Image" accept="image/*" id="input-step-image-@item.StepId" />
                                 </td>
                             </tr>
                         }
@@ -130,12 +131,13 @@
 
         $.ajax({
             type: "POST",
-            url: '/Recipes/UploadRecipeImage',
+            url: '/Recipes/UploadImage',
             data: formData,
             dataType: 'json',
             contentType: false,
             processData: false,
             success: function (response) {
+                console.log("image uploaded: " + response);
                 imageChanged(response);
             },
             error: function (error) {
@@ -240,6 +242,7 @@
             });
         }
     });
+    //delete a step
     $(document).on("click", '[id^="del-step-"]', function () {
         var id = $(this).attr("id").replace("del-step-", "");
         if (confirm("Do you really want to delete this step?")) {
@@ -249,7 +252,6 @@
                 type: "delete",
                 contentType: "application/json",
                 success: function (result, status, xhr) {
-                    console.log("step deleted");
                     $("#step-" + id).remove();
                     $("#step-img-section-" + id).remove();
                 },
@@ -284,7 +286,7 @@
         });
     });
     $("#addStepBtn").on("click", function () {
-        $("#stepsTable").append('<tr id="step-new"><td><input type="text" id="val-step-new" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control"/></td><td><span class="clickable deleteStep" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteStep" id="del-step-new">Xóa bước này</span></div></td></tr><tr id="step-img-section-new"><td><img class="step-img-null" id="img-step-null-new" /></td></tr>');
+        $("#stepsTable").append('<tr id="step-new"><td><input type="text" id="val-step-new" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control"/></td><td><span class="clickable deleteStep" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteStep" id="del-step-new">Xóa bước này</span></div></td></tr><tr id="step-img-section-new"><td><img class="step-img-null" id="img-step-null-new" /><input type="file" asp-for="Image" accept="image/*" id="input-step-image-new" /></td></tr>');
         $.ajax({
             url: "https://localhost:5001/api/Steps",
             type: "post",
@@ -300,14 +302,15 @@
                 $("#val-step-new").prop("id", "val-step-" + result["stepId"]);
                 $("#step-img-section-new").prop("id", "step-img-section-" + result["stepId"]);
                 $("#img-step-null-new").prop("src", "/images/camera.jpg");
-                $("#img-step-null-new").prop("id", "img-step-null" + result["stepId"]);
+                $("#img-step-null-new").prop("id", "img-step-" + result["stepId"]);
+                $("#input-step-image-new").attr("id", "input-step-image-" + result["stepId"]);
             },
             error: function (xhr, status, error) {
                 console.log(xhr);
             }
         });
     });
-    $('[id^="val-ingre-"]').on("change", function () {
+    $(document).on("change", '[id^="val-ingre-"]', function () {
         $.ajax({
             url: "https://localhost:5001/api/Ingredients/" + $(this).attr("id").replace("val-ingre-", ""),
             type: "put",
@@ -325,26 +328,81 @@
             }
         });
     });
-    $('[id^="val-step-"]').on("change", function () {
-        console.log("step changed")
+    $(document).on("change", '[id^="val-step-"]', function () {
+        var stepId = $(this).attr("id").replace("val-step-", "");
         $.ajax({
-            url: "https://localhost:5001/api/Steps/" + $(this).attr("id").replace("val-step-", ""),
-            type: "put",
-            data: JSON.stringify({
-                StepId: $(this).attr("id").replace("val-step-", ""),
-                RecipeId: @Model.RecipeId,
-                Text: $(this).val(),
-                Image: $("#img-step-" + $(this).attr("id").replace("val-step-", "")).attr("src").split('/').pop()
-            }),
+            url: "https://localhost:5001/api/Steps/" + stepId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "text",
+                "value": $(this).val()
+            }]),
             processData: false,
-            contentType: 'application/json',
+            contentType: "application/json",
             success: function (result, status, xhr) {
             },
             error: function (xhr, status, error) {
-                console.log(xhr);
+                console.log(error);
             }
         });
     });
+    //when user uploads a step image
+    $(document).on("change", '[id^="input-step-image-"]', function () {
+        var stepId = $(this).attr("id").replace("input-step-image-", "");
+        //show preview images
+        var preview = document.getElementById('img-step-' + stepId);
+        $('#img-step-' + stepId).removeClass('step-img-null').addClass('step-img');
+        var file = document.getElementById('input-step-image-' + stepId).files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+        //save file to images folder
+        var formData = new FormData();
+        formData.append("input-step-image", file);
+
+        $.ajax({
+            type: "POST",
+            url: '/Recipes/UploadImage',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                stepImageChanged(stepId, response);
+            },
+            error: function (error) {
+                alert("error: " + error);
+            }
+        });
+    });
+    //step image changed
+    function stepImageChanged(stepId, newUrl) {
+        $.ajax({
+            url: "https://localhost:5001/api/Steps/" + stepId,
+            type: "patch",
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "image",
+                "value": newUrl
+            }]),
+            processData: false,
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
 </script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

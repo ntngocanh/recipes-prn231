@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace API.Controllers
 {
@@ -102,6 +103,21 @@ namespace API.Controllers
         private bool StepExists(int id)
         {
             return _context.Steps.Any(e => e.StepId == id);
+        }
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Step> patchEntity)
+        {
+            var entity = _context.Steps.FirstOrDefault(r => r.StepId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return Ok(entity);
         }
     }
 }

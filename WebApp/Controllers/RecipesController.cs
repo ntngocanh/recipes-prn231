@@ -106,7 +106,7 @@ namespace WebApp.Controllers
             return View(recipe);
         }
         [HttpPost]
-        public JsonResult UploadRecipeImage([FromServices] IHostingEnvironment hostingEnvironment)
+        public async Task<JsonResult> UploadImage([FromServices] IHostingEnvironment hostingEnvironment)
         {
             string uniqueFileName = null;
             if (Request.Form.Files.Count != 0)
@@ -119,10 +119,12 @@ namespace WebApp.Controllers
 
                 using (var fs = new FileStream(Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create))
                 {
-                    image.CopyToAsync(fs);
+                    await image.CopyToAsync(fs);
                 }
+                //return Json(image);
             }
             return Json(uniqueFileName);
         }
+        
     }
 }

@@ -94,18 +94,18 @@ namespace API.Controllers
         {
             /*try
             {*/
-                
-                Comment c = mapper.Map<CommentRequest, Comment>(comment);
-                if (comment.ParentCommentId == 0)
-                {
+
+            Comment c = mapper.Map<CommentRequest, Comment>(comment);
+            if (comment.ParentCommentId == 0)
+            {
                 c.ParentComment = null;
-                }
-                _context.Comments.Add(c);
-                await _context.SaveChangesAsync();
-                int id = c.CommentId;
-                Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == id);
-                CommentDTO commentDTO = mapper.Map<Comment, CommentDTO>(c1);
-                return Ok(commentDTO);
+            }
+            _context.Comments.Add(c);
+            await _context.SaveChangesAsync();
+            int id = c.CommentId;
+            Comment c1 = _context.Comments.Include(x => x.User).FirstOrDefault(x => x.CommentId == id);
+            CommentDTO commentDTO = mapper.Map<Comment, CommentDTO>(c1);
+            return Ok(commentDTO);
             /*}
             catch (Exception)
             {
@@ -125,12 +125,12 @@ namespace API.Controllers
             return Ok();
 
         }
-        [HttpPut]
-        public IActionResult EditComment(Comment comment)
+        [HttpPut("{commentId}")]
+        public IActionResult EditComment(CommentRequest comment, int commentId)
         {
             try
             {
-                Comment c = _context.Comments.FirstOrDefault(x => x.CommentId == comment.CommentId);
+                Comment c = _context.Comments.FirstOrDefault(x => x.CommentId == commentId);
                 if (c == null)
                 {
                     return NotFound();

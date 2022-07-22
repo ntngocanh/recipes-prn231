@@ -35,7 +35,7 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Details(int id)
         {
             UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
-            ViewData["userId"] = user.UserId; 
+            ViewData["userId"] = user.UserId;
             HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions

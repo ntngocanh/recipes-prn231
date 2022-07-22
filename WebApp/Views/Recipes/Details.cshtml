@@ -315,11 +315,11 @@
         $(document).on("click", '[id^="edit-comment-"]', function () {
             var id = $(this).attr("id").replace("edit-comment-", "");
             var commentBox = $("#comment-content-" + id);
-            var commentContent = $("#comment-content-" + id).text();
+            commentContent = $("#comment-content-" + id).text();
             var htmlContent = `<div class="row flex-row align-items-center" id="comment-box">
                 
                 <div class="">
-                    <textarea rows="1" id="comment-input" class="comment-input textarea form-rounded" role="textbox" contenteditable>` + $("#comment-content-" + id).text() + `</textarea>
+                    <textarea rows="1" id="comment-input-` + id+ `" class="comment-input textarea form-rounded" role="textbox" contenteditable>` + $("#comment-content-" + id).text() + `</textarea>
                 </div>
                 <button id="comment-edit-`+ id +`" class="comment-post-btn float-left btn" type="button">Post</button>
                 <button id="comment-cancel-`+ id +`" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
@@ -329,9 +329,34 @@
         });
 
         $(document).on("click", '[id^="comment-edit-"]', function () {
-            
+            var id = $(this).attr("id").replace("comment-edit-", "");
+            var textContent = $("#comment-input-" + id).val();
+            var json = {
+                text: $("#comment-input-" + id).val(),
+            };
+            var commentBox = $("#comment-content-" + id);
+
+            $.ajax({
+                url: "https://localhost:5001/api/Comments/" + id,
+                method: "put",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (result, status, xhr) {
+                    commentBox.html(textContent);
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
         });
 
+        $(document).on("click", '[id^="comment-cancel-"]', function () {
+            console.log("click");
+            var id = $(this).attr("id").replace("comment-cancel-", "");
+            var commentBox = $("#comment-content-" + id);
+
+            commentBox.html(commentContent);
+        });
 
             
 

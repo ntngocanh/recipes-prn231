@@ -33,7 +33,22 @@ namespace API.Controllers
         {
             return await _context.Recipes.ToListAsync();
         }
+        [HttpGet("Statistic")]
 
+        public ActionResult GetRecipesByPast7Day()
+        {
+           
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            for (int i = 6; i >= 0; i--) {
+                var num = _context.Recipes.Where(x => EF.Functions.DateDiffDay(x.DateCreated,DateTime.Now) == i).AsEnumerable().ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(DateTime.Now.AddDays(-i).ToString("yyyy-MM-dd")),number));
+            }
+            return Ok(list);
+          
+        }
         // GET: api/Recipes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)

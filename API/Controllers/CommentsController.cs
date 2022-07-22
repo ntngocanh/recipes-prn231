@@ -68,7 +68,7 @@ namespace API.Controllers
             return Ok(commentDTOs);
         }
         [HttpGet("getByComment/{commentId}")]
-        public async Task<ActionResult<IEnumerable<CommentDTO>>> GetCommentReplies(int commentId)
+        public ActionResult<IEnumerable<CommentDTO>> GetCommentReplies(int commentId)
         {
             if (_context.Comments.FirstOrDefault(x => x.CommentId == commentId) == null)
             {

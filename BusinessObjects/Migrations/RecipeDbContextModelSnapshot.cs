@@ -305,7 +305,7 @@ namespace BusinessObjects.Migrations
                 {
                     b.HasOne("BusinessObjects.Models.Comment", "ParentComment")
                         .WithMany()
-                        .HasForeignKey("ParentCommentId");
+                        .HasForeignKey("ParentCommentId").OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BusinessObjects.Models.Recipe", "Recipe")
                         .WithMany("Comments")

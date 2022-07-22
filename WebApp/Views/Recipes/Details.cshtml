@@ -26,8 +26,11 @@
             </div>
         }
         <div class="section">
-            <div class="form-group">
+            <div class="form-group" style="display:inline">
                 <span asp-for="Name" id="nameBox">@Model.Name</span>
+            </div>
+            <div style="float:right; display:inline">
+                <img src="~/images/AddToCollection.png" height="50" alt="Add To Collection" class="addToColl">
             </div>
             <div class="form-group">
                 <span id="descriptionBox" asp-for="Description"></span>
@@ -144,9 +147,9 @@
             </div>
 
         </div>
-            <div class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
+            <div class="modal" id="report-modal">
+                <div class="modal-content" id="report-modal-content">
+                    <span class="close" id="report-modal-close">&times;</span>
                     <p>Báo cáo comment này?</p>
                     <input type="number" class="reportCommentIdTxt" id="reportCommentId" style="display:none">
                     <div class="form-group">
@@ -156,6 +159,21 @@
                     <div class="text-center panel-body">
                         <button type="submit" class="btn btn-sm btn-primary" id="ReportButton">Báo cáo comment</button>
                     </div>
+                </div>
+            </div>
+            <div class="modal" id="coll-modal">
+                <div class="modal-content" id="coll-modal-content">
+                    <span class="close" id="coll-modal-close">&times;</span>
+                    <p>Add to a Collection</p>
+                    <table cellspacing="0" cellpadding="0" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
     </div>
@@ -518,13 +536,13 @@
 
 
 
-        $(document).ready(function () {
-            
+
+        $(document).on("click", '[id^="report-comment-"]', function () {
           var commentidtxt = $('.reportCommentIdTxt');
-          var modal = $('.modal');
+          var modal = $("#report-modal");
           var btn = $('.reportCmt');
-          var span = $('.close');
-          var commentid = btn.attr("id").replace("report-comment-", "");
+          var span = $("#report-modal-close");
+          var commentid = $(this).attr("id").replace("report-comment-", "");
 
           $("#reportCommentId").val(commentid);
 
@@ -537,11 +555,31 @@
           });
 
           $(window).on('click', function (e) {
-            if ($(e.target).is('.modal')) {
+            if ($(e.target).is("#report-modal")) {
               modal.hide();
             }
           });
         });
+        $(document).ready(function () {
+          var modal = $("#coll-modal");
+          var btn = $('.addToColl');
+          var span = $("#coll-modal-close");
+
+          btn.click(function () {
+            modal.show();
+          });
+
+          span.click(function () {
+            modal.hide();
+          });
+
+          $(window).on('click', function (e) {
+            if ($(e.target).is("#coll-modal")) {
+              modal.hide();
+            }
+          });
+        });
+
         $("#ReportButton").click(function(e) {
             data = new FormData();
             data.append("CommentId", $("#reportCommentId").val());
@@ -556,7 +594,7 @@
                 contentType: "application/json",
                 success: function(result, status, xhr) {
                     console.log(status);
-                    var modal = $('.modal');
+                    var modal = $("#report-modal");
                     modal.hide();
                 },
                 error: function(xhr, status, error) {
@@ -564,6 +602,51 @@
                 }
             });
         });
+
+        $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Collections/getByUser/" + @ViewData["userId"] + "/" + @Model.RecipeId,
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function(result, status, xhr) {
+                    $.each(result, function(index, value) {
+                        $("tbody").append($("<tr>"));
+                        appendElement = $("tbody tr").last();
+                        appendElement.append($("<td>"));
+                        buttonElement = $("tbody td").last();
+                        buttonElement.append($("<button style='margin:5px' class='btn btn-sm btn-primary' id='addcoll-" + value["collectionId"] + "'>").html(value["name"]));
+                        appendElement.append($("<td>").html(value["description"]));
+                        
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+            $(document).on("click", '[id^="addcoll-"]', function () {
+                data = new FormData();
+                data.append("CollectionId", $(this).attr("id").replace("addcoll-", ""));
+                data.append("RecipeId", @Model.RecipeId);
+                var object = {};
+                data.forEach((value, key) => object[key] = value);
+                console.log(JSON.stringify(object))
+                $.ajax({
+                    url: "https://localhost:5001/api/Recipes/addToCollection/",
+                    type: "post",
+                    data: JSON.stringify(object),
+                    contentType: "application/json",
+                    success: function(result, status, xhr) {
+                        console.log(status);
+                        var modal = $("#coll-modal");
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+            });
     </script>
     <style>
           .modal {

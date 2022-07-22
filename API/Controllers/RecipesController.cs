@@ -10,6 +10,7 @@ using AutoMapper;
 using API.DTO;
 using BusinessObjects.Models;
 using BusinessObjects.DTO;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace API.Controllers
 {
@@ -96,16 +97,13 @@ namespace API.Controllers
 
         //Add Recipe to Collection
 
-        [HttpPost("addToCollection/{collectionId}")]
-        public async Task<ActionResult<Recipe>> PostToCollection(int collectionId, Recipe recipe)
+        [HttpPost("addToCollection")]
+        public async Task<ActionResult<Recipe>> PostToCollection(CollectionRecipe cr)
         {
-            CollectionRecipe cr = new CollectionRecipe();
-            cr.CollectionId = collectionId;
-            cr.RecipeId = recipe.RecipeId;
             _context.CollectionRecipes.Add(cr);
             await _context.SaveChangesAsync();
 
-            return recipe;
+            return Ok();
         }
 
         // DELETE: api/Recipes/5
@@ -127,6 +125,21 @@ namespace API.Controllers
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
+        }
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Recipe> patchEntity)
+        {
+            var entity = _context.Recipes.FirstOrDefault(r => r.RecipeId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return Ok(entity);
         }
 
     }

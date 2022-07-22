@@ -61,6 +61,23 @@
 
             }
         </div>
+        <hr/>
+        <div class="section">
+            <div class="row flex-row px-3">
+                <button type="button" id="heart-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/heart-reaction.png"></span>
+                    <span id="heart-react-count"></span>
+                </button>
+                <button type="button" id="yummy-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/yummy-reaction.png"></span>
+                    <span id="yummy-react-count"></span>
+                </button>
+                <button type="button" id="clap-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/clap-reaction.png"></span>
+                    <span id="clap-react-count"></span>
+                </button>
+            </div>
+        </div>
         <hr />
         <div class="section">
             <div class="tableTitle"><i style="margin-right:10px" class="fa-regular fa-message"></i>Bình luận</div>
@@ -111,7 +128,7 @@
                             <div class="col-lg-2 dropdown-section">
                                 <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    @if ((int)ViewData["userId"] == comment.User.UserId)
+                                    @if (ViewData["userId"] !=null && (int)ViewData["userId"] == comment.User.UserId)
                                     {
                                         <div class="delCmt" id="del-comment-@comment.CommentId">Xóa bình luận</div>
                                         <div class="editCmt" id="edit-comment-@comment.CommentId">Sửa bình luận</div>
@@ -146,8 +163,149 @@
         <div style="display:none" id="recipe-id">@Model.RecipeId</div>
     </div>
 </div>
-
+<script src="~/js/reactions.js"></script>
 <script type="text/javascript">
+    $(document).ready(function () {
+        if (!'@ViewData["userId"]') {
+            $("#comment-input").prop('disabled', true);
+            $(".comment-post-btn").prop('disabled', true);
+            $(".reply").prop('disabled', true);
+            $(".reply").hide();
+            $(".delCmt").prop('disabled', true);
+            $(".delCmt").hide();
+            $(".react-btn").prop('disabled', true);
+        }
+        if ('@ViewData["userId"]') {
+            GetCurrentUserReact('@ViewData["userId"]', $("#recipe-id").text());
+        }
+    });
+
+    $(".react-btn").on("click", function () {
+        var newReactionType;
+        if ($(this).attr("id") == "heart-react-btn") {
+            newReactionType = 0;
+        }
+        if ($(this).attr("id") == "yummy-react-btn") {
+            newReactionType = 1;
+        }
+        if ($(this).attr("id") == "clap-react-btn") {
+            newReactionType = 2;
+        }
+        console.log("new type" + newReactionType);
+        var oldReactionType;
+        $.ajax({
+            url: "https://localhost:5001/api/Reactions/getByUserAndRecipe/" + $("#recipe-id").text() + "/" + '@ViewData["userId"]',
+            method: 'get',
+            contentType: "application/json",
+            statusCode: {
+                404: function () {
+                    var postJson = {
+                        userId: '@ViewData["userId"]',
+                        recipeId: $("#recipe-id").text(),
+                        reactionType: newReactionType
+                    };
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'post',
+                        contentType: "application/json",
+                        data: JSON.stringify(postJson),
+                        success: function (result, status, xhr) {
+                            switch (postJson.reactionType) {
+                                case 0:
+                                    $("#heart-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yum-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").addClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                }
+            },
+            success: function (result, status, xhr) {
+                oldReactionType = result["reactionType"];
+                console.log('old type' + oldReactionType);
+                var json = {
+                    userId: result["userId"],
+                    recipeId: result["recipeId"],
+                    reactionType: oldReactionType
+                };
+                if (oldReactionType != newReactionType) {
+                    json.reactionType = newReactionType;
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'put',
+                        contentType: "application/json",
+                        data: JSON.stringify(json),
+                        success: function (result, status, xhr) {
+                            switch (oldReactionType) {
+                                case 0:
+                                    $("#heart-react-btn").attr("class", "react-btn");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").attr("class", "react-btn");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").attr("class", "react-btn");
+                                    break;
+                            }
+                            switch (newReactionType) {
+                                case 0:
+                                    $("#heart-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").addClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'delete',
+                        contentType: "application/json",
+                        data: JSON.stringify(json),
+                        success: function (result, status, xhr) {
+                            switch (json.reactionType) {
+                                case 0:
+                                    $("#heart-react-btn").removeClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").removeClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").removeClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                }
+                getReactionsCount();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+        getReactionsCount();
+    });
 
     var textarea = document.getElementById("comment-input");
     var limit = 200;
@@ -317,7 +475,7 @@
             var commentBox = $("#comment-content-" + id);
             commentContent = $("#comment-content-" + id).text();
             var htmlContent = `<div class="row flex-row align-items-center" id="comment-box">
-                
+
                 <div class="">
                     <textarea rows="1" id="comment-input-` + id+ `" class="comment-input textarea form-rounded" role="textbox" contenteditable>` + $("#comment-content-" + id).text() + `</textarea>
                 </div>
@@ -325,7 +483,7 @@
                 <button id="comment-cancel-`+ id +`" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
             </div>`;
             commentBox.html(htmlContent);
-            
+
         });
 
         $(document).on("click", '[id^="comment-edit-"]', function () {
@@ -358,9 +516,10 @@
             commentBox.html(commentContent);
         });
 
-            
+
 
         $(document).ready(function () {
+            
           var commentidtxt = $('.reportCommentIdTxt');
           var modal = $('.modal');
           var btn = $('.reportCmt');

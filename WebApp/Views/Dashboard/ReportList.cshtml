@@ -4,6 +4,8 @@
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
 <h2>
     Reported Comment
 </h2>
@@ -12,7 +14,7 @@
 <table id="table" class="table table-sm table-striped table-bordered text-center    ">
     <thead>
         <tr>
-           
+
             <th>UserName</th>
             <th>Email</th>
             <th>Comment</th>
@@ -20,7 +22,7 @@
             <th>Link</th>
             <th>Accept Remove</th>
             <th>Reject Remove</th>
-           
+
         </tr>
     </thead>
     <tbody></tbody>
@@ -28,8 +30,11 @@
 <script>
     function accept(id) {
         $.ajax({
-            url: "https://localhost:5001/api/Comments/"+id,
+            url: "https://localhost:5001/api/Comments/" + id,
             type: "delete",
+             headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (result, status, xhr) {
@@ -47,6 +52,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Comments/Report/" + id,
             type: "delete",
+             headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (result, status, xhr) {

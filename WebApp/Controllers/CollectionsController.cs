@@ -104,6 +104,7 @@ namespace WebApp.Controllers
             {
                 ViewData["userId"] = user.UserId;
                 ViewData["collId"] = id;
+                ViewBag.CollId = id;
             }
             return View();
         }

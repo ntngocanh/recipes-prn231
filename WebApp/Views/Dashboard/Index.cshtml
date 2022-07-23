@@ -5,6 +5,8 @@
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
 <div class="container">
 
     <label>Start Date:&nbsp&nbsp&nbsp&nbsp&nbsp</label><input id="startDate" type="date">
@@ -36,7 +38,7 @@
         console.log(document.getElementById('startDate').valueAsDate.toLocaleString().Date);
         $.noConflict();
         $("#startDate").change(function () {
-            
+
             $("#chartContainer").CanvasJSChart().destroy();
             var date = new Date($('#startDate').val());
             var day = date.getDate();
@@ -48,15 +50,18 @@
             var month = date.getMonth() + 1;
             var year = date.getFullYear();
             let end = month + "-" + day + "-" + year;
-            
+
             $.ajax({
                 url: "https://localhost:5001/api/Recipes/Statistic/" + start + "/" +end,
                 type: "get",
+                headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (result, status, xhr) {
 
-                   
+
                     addData(result);
 
                 },
@@ -83,6 +88,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Recipes/Statistic/" + start + "/" + end,
                 type: "get",
+                headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (result, status, xhr) {
@@ -97,9 +105,9 @@
 
             });
         });
-        
+
         var PieData = [];
-        
+
 
         function addData(data) {
             let dataPoints = [];
@@ -120,10 +128,10 @@
                     valueFormatString: "DD MMM YYYY",
                     intervalType: "day",
                     interval: 1
-                    
+
                 },
                 axisY: {
-                   
+
                     titleFontSize: 24
                 },
                 data: [{
@@ -141,7 +149,7 @@
                     y: data[i].percentage,
                     label: data[i].role
                 });
-               
+
             }
             $("#PiechartContainer").CanvasJSChart(Pieoptions);
 
@@ -167,9 +175,9 @@
                 dataPoints: PieData
             }]
         };
-       
 
-    
+
+
     });
 </script>
 

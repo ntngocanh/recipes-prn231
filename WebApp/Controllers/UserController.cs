@@ -129,8 +129,11 @@ namespace WebApp.Controllers
 
             if (response.IsSuccessStatusCode)
             {
+                var userDTO = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+                userDTO.RequestToVIP = true;
+                SessionExtension.Set<UserDTO>(HttpContext.Session, "user", userDTO);
                 return Json("Successfully");
-                SessionExtension.Get<UserDTO>(HttpContext.Session, "user").RequestToVIP = false;
+                
 
             }
             else return Json("Request fail!");

@@ -163,7 +163,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{commentId}")]
         [Authorize]
 
@@ -205,6 +205,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("Report/{reportId}")]
         public IActionResult DeleteReport(int reportId)
         {
@@ -222,7 +223,7 @@ namespace API.Controllers
                         return NotFound();
                     }
                     c.CommentStatus = CommentStatus.Posted;
-
+                    _context.Remove(report);
                     _context.SaveChanges();
                 }
                

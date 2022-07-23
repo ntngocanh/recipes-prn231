@@ -29,8 +29,6 @@
     <Folder Include="wwwroot\lib\jquery-validation\dist\" />
     <Folder Include="wwwroot\lib\jquery\" />
     <Folder Include="wwwroot\lib\jquery\dist\" />
-	  <Folder Include="Views\Collections\" />
-    <Folder Include="Views\Collections\" />
     <Folder Include="wwwroot\images\fromUsers\" />
   </ItemGroup>
 

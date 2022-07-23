@@ -26,7 +26,7 @@ namespace API.Controllers
             mapper = config.CreateMapper();
         }
 
-//Get All Collections of user by page
+        //Get All Collections of user by page
 
         [HttpGet("getByUserPaged/{userId}/{page}")]
         public IActionResult GetByUserPaged(int userId, int page)
@@ -77,7 +77,7 @@ namespace API.Controllers
             return Ok(_context.Collections.Where(x => x.UserId == userId).Count());
         }
 
-//Get All Collections of user without recipe
+        //Get All Collections of user without recipe
 
         [HttpGet("getByUser/{userId}/{recipeId}")]
         public IActionResult GetByUser(int userId, int recipeId)
@@ -112,7 +112,7 @@ namespace API.Controllers
             return Ok(collectionDTOs);
         }
 
-//Get All Recipes of Collection
+        //Get All Recipes of Collection
 
         [HttpGet("GetRecipes/{collectionId}/{page}")]
         public IActionResult GetRecipesByCollection(int collectionId, int page)
@@ -152,7 +152,7 @@ namespace API.Controllers
             return Ok(recipeToDisplay);
         }
 
-//Get Collection
+        //Get Collection
 
         [HttpGet("{collectionId}")]
         public IActionResult GetCollection(int collectionId)
@@ -167,7 +167,7 @@ namespace API.Controllers
             return Ok(collectionDTO);
         }
 
-//Edit Collection
+        //Edit Collection
 
         [HttpPut("{collectionId}")]
         public async Task<IActionResult> PutCollection(int collectionId, Collection collection)
@@ -198,7 +198,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-//Add Collection
+        //Add Collection
 
         [HttpPost]
         public async Task<ActionResult<Collection>> PostCollection(Collection collection)
@@ -228,9 +228,10 @@ namespace API.Controllers
 
         //Delete CollectionRecipe
 
-        [HttpDelete("DeleteCR")]
-        public async Task<IActionResult> DeleteCollectionRecipe(CollectionRecipe cr)
+        [HttpDelete("DeleteCR/{cId}/{rId}")]
+        public async Task<IActionResult> DeleteCollectionRecipe(int cId, int rId)
         {
+            CollectionRecipe cr = _context.CollectionRecipes.FirstOrDefault(x => x.CollectionId == cId && x.RecipeId == rId);
             if (cr == null)
             {
                 return NotFound();

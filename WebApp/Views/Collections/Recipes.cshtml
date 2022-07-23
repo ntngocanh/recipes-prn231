@@ -6,9 +6,10 @@
     <br />
     <br />
     <br />
-    <form action="/Collections/Edit/@ViewBag.CollId" style="display:inline; float:right;">
+    <form action="/Collections/Edit/@ViewBag.CollId" style="display:inline; float:right;" id="editBtn">
         <input type="submit" value="Chỉnh sửa" style="width:100px" class="btn btn-primary"/>
     </form>
+
     <div class="row">
     
         <div class="col-8"><p class="newestdish" id="collectionName" filter-content="S"></p></div>
@@ -24,6 +25,9 @@
 </div>
 <script>
     $(document).ready(function () {
+
+
+
         var userId;
         $.ajax({
             url: "https://localhost:5001/api/Collections/" + @ViewData["collId"],
@@ -75,6 +79,11 @@
                         $("#endWarning").show();
                         //$("#newColl").hide();
                     }
+                    if (@ViewData["userId"] != userId)
+                    {
+                        $("#editBtn").hide();
+                    }
+
                     $.each(result, function (index, value) {
                         
                         appendElement = $("#newest");
@@ -88,7 +97,7 @@
                         else {
                             raw += "<img src='"+"../../Images/fromUsers/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
-                        raw += "<a href='../../User/Details?Id="+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
+                        raw += "<a href='../../User/Profile/"+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
                         raw +="<div class=\"card\" style=\"width: 15rem;\">";
                         raw += "<div class=\"card-body\">";
                         if (value["image"] == null) {

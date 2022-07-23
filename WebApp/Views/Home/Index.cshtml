@@ -72,7 +72,7 @@
                         else {
                             raw += "<img src='"+"../Images/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
-                        raw += "<a href='../User/Details?Id="+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
+                        raw += "<a href='../User/Profile/"+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
                         raw +="<div class=\"card\" style=\"width: 15rem;\">";
                         raw += "<div class=\"card-body\">";
                         if (value["image"] == null) {

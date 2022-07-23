@@ -1,0 +1,102 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+<h2>
+    Reported Comment
+</h2>
+
+
+<table id="table" class="table table-sm table-striped table-bordered text-center    ">
+    <thead>
+        <tr>
+           
+            <th>UserName</th>
+            <th>Email</th>
+            <th>Comment</th>
+            <th>Report Message</th>
+            <th>Link</th>
+            <th>Accept Remove</th>
+            <th>Reject Remove</th>
+           
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+    function accept(id) {
+        $.ajax({
+            url: "https://localhost:5001/api/Comments/"+id,
+            type: "delete",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result, status, xhr) {
+                showUser();
+
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+
+        });
+    }
+
+    function reject(id) {
+        $.ajax({
+            url: "https://localhost:5001/api/Comments/Report/" + id,
+            type: "delete",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result, status, xhr) {
+                showUser();
+
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+
+        });
+    }
+
+</script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function () {
+        showUser();
+        $.noConflict();
+
+
+
+        function showUser() {
+            $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Comments/Report",
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, value) {
+                        $("tbody").append($("<tr>"));
+                        appendElement = $("tbody tr").last();
+                        appendElement.append($("<td>").html(value["comment"]["user"]["name"]));
+                        appendElement.append($("<td>").html(value["comment"]["user"]["email"]));
+                        appendElement.append($("<td>").html(value["comment"]["text"]));
+                        appendElement.append($("<td>").html(value["text"]));
+                        //appendElement.append($("<td>").html(value["role"]["roleName"]));
+                        appendElement.append($("<td>").html("<a  href=\"../../Recipes/Details/2" + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
+                        appendElement.append($("<td>").html("<a onclick='accept(" + value["comment"]["commentId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
+                        appendElement.append($("<td>").html("<a onclick='reject(" + value["reportId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
+                    });
+                    $('#table').DataTable();
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        }
+    });
+</script>

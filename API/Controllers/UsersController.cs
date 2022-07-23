@@ -103,9 +103,26 @@ namespace API.Controllers
             if (u.RoleId == 3) {
                 return AcceptedAtAction("User is already premium!");
             }
+            u.RoleId = 3;
+            _context.SaveChanges();
             return Ok("Upgrade Successfully!");
         }
-        
+        [HttpPut]
+        [Route("EditProfile/{Id}")]
+        public ActionResult EditProfile(int Id,User user)
+        {
+            var u = _context.Users.FirstOrDefault(x => x.UserId == Id);
+            if (u == null)
+            {
+                return NotFound();
+            }
+            u.Name = user.Name;
+            u.RoleId = user.RoleId;
+            u.Avatar = user.Avatar;
+            _context.SaveChanges();
+            return Ok();
+        }
+
 
         [HttpPost("check")]
         public ActionResult<User> CheckExisted(string email)
@@ -131,8 +148,16 @@ namespace API.Controllers
                 u.Email = user.Email;
                 u.Name = user.Name;
                 u.Role = user.Role;
+                u.Avatar = user.Avatar;
                 return Ok(u);
             }
+        }
+
+        [HttpGet("Test/{id}")]
+        public ActionResult Getest(int id)
+        {
+            var user = _context.Users.Include("Role").Include(x=>x.Recipes).SingleOrDefault(a => a.UserId == id);
+            return Ok(User);
         }
     }
 }

@@ -7,6 +7,10 @@
 .icon {
     max-width: 25px;
 }
+#avaimg {
+    max-width: 192px !important;
+    max-height: 192px !important;
+}
 body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;

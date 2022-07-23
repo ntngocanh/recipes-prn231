@@ -47,7 +47,22 @@ namespace API.Controllers
             }
             return Ok(commentDTOs);
         }
-
+        [HttpGet("Report")]
+        public IActionResult GetReported()
+        {
+            List<Report> reports = _context.Reports.Include(x=>x.Comment).ThenInclude(x=>x.User).ToList();
+          /*  List<Comment> comments = _context.Comments.Include(x => x.User).Where(x => x.CommentStatus == CommentStatus.Reported).ToList();
+            if (comments == null)
+            {
+                return NotFound();
+            }
+            List<CommentDTO> commentDTOs = comments.Select(m => mapper.Map<Comment, CommentDTO>(m)).ToList();
+            foreach (CommentDTO c in commentDTOs)
+            {
+                c.NumberOfReplies = CountReplies(c.CommentId);
+            }*/
+            return Ok(reports);
+        }
         [HttpGet("getByRecipeBase/{recipeId}")]
         public IActionResult GetByRecipeBaseLevel(int recipeId)
         {
@@ -156,7 +171,56 @@ namespace API.Controllers
                     return NotFound();
                 }
                 c.CommentStatus = CommentStatus.Hidden;
+
                 _context.SaveChanges();
+                List<Comment> cs = _context.Comments.Where(x => x.ParentCommentId == commentId).ToList();
+                if (cs != null)
+                {
+                    foreach (Comment comment in cs)
+                    {
+                        var cm = _context.Comments.FirstOrDefault(x => x.CommentId == comment.CommentId);
+                        cm.CommentStatus = CommentStatus.Hidden;
+                        _context.SaveChanges();
+                    }
+                }
+                List<Report> cr = _context.Reports.Where(x => x.CommentId == commentId).ToList();
+                if (cr != null) {
+                    foreach (Report comment in cr)
+                    {
+                        var cm = _context.Reports.FirstOrDefault(x => x.CommentId == comment.CommentId);
+                        _context.Remove(cm);
+                        _context.SaveChanges();
+                    }
+                }
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        [HttpDelete("Report/{reportId}")]
+        public IActionResult DeleteReport(int reportId)
+        {
+            try
+            {
+                Report report = _context.Reports.FirstOrDefault(x => x.ReportId == reportId);
+                if (report == null)
+                {
+                    return NotFound();
+                }
+                else {
+                    Comment c = _context.Comments.FirstOrDefault(x => x.CommentId == report.CommentId);
+                    if (c == null)
+                    {
+                        return NotFound();
+                    }
+                    c.CommentStatus = CommentStatus.Posted;
+
+                    _context.SaveChanges();
+                }
+               
+               
                 return Ok();
             }
             catch (Exception)

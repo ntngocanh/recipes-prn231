@@ -2,7 +2,197 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <br />
+    <br />
+    <br />
+
+    <div class="row">
+        <div class="col-8"><p><span class="newestdish" filter-content="S">Những Công Thức Mới Nhất!!!</span></p></div>
+
+        <div style="text-align:right;" class="col-4"><a class="SeeMore" href="#">Xem Tất Cả</a></div>
+    </div>
+    <div id="newest" class="row">
+
+
+
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-8"><p><span class="newestdish" filter-content="S">Những Thành Viên Tích Cực!!!</span></p></div>
+
+
+    </div>
+    <div id="trend" class="row">
+
+
+
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-8"><p><span class="newestdish" filter-content="S">Từ Những Đầu Bếp Uy Tín!!!</span></p></div>
+
+        <div style="text-align:right;" class="col-4"><a class="SeeMore" href="#">Xem Tất Cả</a></div>
+    </div>
+    <div id="premium" class="row">
+
+
+
+    </div>
 </div>
+<script>
+    $(document).ready(function () {
+        showUser();
+        showTrend();
+        showPremium();
+        $.noConflict();
+
+
+
+        function showUser() {
+            $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/HomePage",
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, value) {
+                        
+                        appendElement = $("#newest");
+                        let raw = ""
+                        
+                        raw += "<div class='col-3'>";
+
+                        if (value["user"]["avatar"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        else {
+                            raw += "<img src='"+"../Images/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        raw += "<a href='../User/Details?Id="+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
+                        raw +="<div class=\"card\" style=\"width: 18rem;\">";
+                        raw += "<div class=\"card-body\">";
+                        if (value["image"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        
+                        raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";
+                        raw += "<p class=\"card-text\">" + value["description"] + "</p>";
+                        raw += "<a href=\"../Recipes/Details/" + value["recipeId"] + "\" class=\"btn btn-primary\">View Details</a>";
+                        raw +="</div>";
+                        raw +="</div>";
+                        raw += "</div>";
+                        console.log(raw);
+                        appendElement.append(raw);
+                    });
+                 
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        }
+
+        function showPremium() {
+            $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/HomePage/Premium",
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, value) {
+
+                        appendElement = $("#premium");
+                        let raw = ""
+
+                        raw += "<div class='col-3'>";
+
+                        if (value["user"]["avatar"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        raw += "<a href='../User/Details?Id=" + value["user"]["userId"] + "'> " + value["user"]["name"] +"</a>";
+                        raw += "<div class=\"card\" style=\"width: 18rem;\">";
+                        raw += "<div class=\"card-body\">";
+                        if (value["image"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+
+                        raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";
+                        raw += "<p class=\"card-text\">" + value["description"] + "</p>";
+                        raw += "<a href=\"../Recipes/Details/" + value["recipeId"] + "\" class=\"btn btn-primary\">View Details</a>";
+                        raw += "</div>";
+                        raw += "</div>";
+                        raw += "</div>";
+                        console.log(raw);
+                        appendElement.append(raw);
+                    });
+
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        }
+
+        function showTrend() {
+            $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/HomePage/Trend",
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, value) {
+
+                        appendElement = $("#trend");
+                        let raw = ""
+
+                        raw += "<div class='col-3'>";
+
+                        
+                        raw += "<div class=\"card\" style=\"width: 18rem;\">";
+                        raw += "<div class=\"card-body\">";
+                        if (value["user"]["avatar"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='img-circle thumbnail' alt='...'>";
+                        }
+
+                        raw += "<h5 class=\"card-title\">" + value["user"]["name"] + "</h5>";
+                        raw += "<p class=\"card-text\">Số Công Thức Đã Chia Sẻ: " + value["count"] + "</p>";
+                        raw += "<a href=\"../User/Details?Id=" + value["user"]["userId"] + "\" class=\"btn btn-primary\">View Details</a>";
+                        raw += "</div>";
+                        raw += "</div>";
+                        raw += "</div>";
+                        console.log(raw);
+                        appendElement.append(raw);
+                    });
+
+
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+        }
+    });
+</script>

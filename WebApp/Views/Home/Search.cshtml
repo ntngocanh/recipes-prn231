@@ -22,10 +22,10 @@
     @foreach (var item in Model)
     {
         <div class="child">
-            <img src="../Images/@item.User.Avatar" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=@item.User.UserId"> @item.User.Name</a>
+            <img src="../Images/fromUsers/@item.User.Avatar" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Profile/@item.User.UserId"> @item.User.Name</a>
             <div class="card" style="width: 15rem;">
                 <div class="card-body">
-                    <img src="../Images/@item.Image" class=" img-circle thumbnail" alt="...">
+                    <img src="../Images/fromUsers/@item.Image" class=" img-circle thumbnail" alt="...">
                     <h5 class="card-title">@item.Name</h5>
                     <p class="card-text">@item.Description</p>
                     <a href="../Recipes/Details/@item.RecipeId" class="btn btn-primary btn-details">View Details</a>
@@ -54,10 +54,10 @@
                         console.log("empty");
                     }
                     $.each(result, function (index, value) {
-                        var htmlContent = `<img src="../Images/` + value["user"]["avatar"] +`" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=` + value["user"]["userId"] +`"> ` + value["user"]["name"] +`</a>
+                        var htmlContent = `<img src="../Images/fromUsers/` + value["user"]["avatar"] +`" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Profile/` + value["user"]["userId"] +`"> ` + value["user"]["name"] +`</a>
                                                 <div class="card" style="width: 15rem;">
                                                     <div class="card-body">
-                                                        <img src="../Images/` + value["image"] +`" class=" img-circle thumbnail" alt="...">
+                                                        <img src="../Images/fromUsers/` + value["image"] +`" class=" img-circle thumbnail" alt="...">
                                                         <h5 class="card-title">` + value["name"]+`</h5>
                                                         <p class="card-text">` + value["description"] +`</p>
                                                         <a href="../Recipes/Details/` + value["recipeId"] +`" class="btn btn-primary">View Details</a>
@@ -88,10 +88,10 @@
                     console.log("empty");
                 }
                 $.each(result, function (index, value) {
-                    var htmlContent = `<img src="../Images/` + value["user"]["avatar"] + `" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=` + value["user"]["userId"] + `"> ` + value["user"]["name"] + `</a>
+                    var htmlContent = `<img src="../Images/fromUsers/` + value["user"]["avatar"] + `" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Profile/` + value["user"]["userId"] + `"> ` + value["user"]["name"] + `</a>
                                                 <div class="card" style="width: 15rem;">
                                                     <div class="card-body">
-                                                        <img src="../Images/` + value["image"] + `" class=" img-circle thumbnail" alt="...">
+                                                        <img src="../Images/fromUsers/` + value["image"] + `" class=" img-circle thumbnail" alt="...">
                                                         <h5 class="card-title">` + value["name"] + `</h5>
                                                         <p class="card-text">` + value["description"] + `</p>
                                                         <a href="../Recipes/Details/` + value["recipeId"] + `" class="btn btn-primary">View Details</a>

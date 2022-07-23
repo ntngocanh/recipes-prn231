@@ -99,6 +99,29 @@ namespace API.Controllers
         {
             return _context.Users.Where(x=>x.RoleId==3).ToList();
         }
+        [HttpGet]
+        [Route("PremiumRequest")]
+        public ActionResult<List<User>> GetAllRequest()
+        {
+            var user = _context.Users.Include("Role").Where(a => a.RequestToVIP == true).ToList();
+            if (user == null)
+                return NotFound();
+            else
+            {
+                List<User> us = new List<User>();
+                foreach(User ur in user){
+                    User u = new User();
+                    u.UserId = ur.UserId;
+                    u.Email = ur.Email;
+                    u.Name = ur.Name;
+                    u.Role = ur.Role;
+                    u.Avatar = ur.Avatar;
+                    us.Add(u);
+                }
+                
+                return Ok(us);
+            }
+        }
 
         [HttpPut]
         [Route("Premium/{Id}")]
@@ -113,6 +136,28 @@ namespace API.Controllers
             u.RoleId = 3;
             _context.SaveChanges();
             return Ok("Upgrade Successfully!");
+        }
+
+
+
+        [HttpPut]
+        [Route("RequestVIP/{Id}")]
+        public ActionResult Request(int Id)
+        {
+            var u = _context.Users.FirstOrDefault(x => x.UserId == Id);
+            if (u == null)
+            {
+                return NotFound();
+            }
+            if (u.RoleId == 3)
+            {
+                return AcceptedAtAction("User is already premium!");
+            }
+            if (u.RequestToVIP == false)
+                u.RequestToVIP = true;
+            else u.RequestToVIP = false;
+            _context.SaveChanges();
+            return Ok("Request Successfully!");
         }
         [HttpPut]
         [Route("EditProfile/{Id}")]

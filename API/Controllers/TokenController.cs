@@ -49,7 +49,8 @@ namespace API.Controllers
                     new Claim("Avatar", user.Avatar),
                     new Claim("Email", user.Email),
                     new Claim("UserId", user.UserId.ToString()),
-                    new Claim(ClaimTypes.Role,user.Role.RoleName)
+                    new Claim(ClaimTypes.Role,user.Role.RoleName),
+                    new Claim("RequestToVIP",user.RequestToVIP.ToString())
                    };
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

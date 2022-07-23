@@ -45,7 +45,7 @@
                         appendElement.append($("<td>").html(value["userId"]));
                         appendElement.append($("<td>").html(value["name"]));
                         appendElement.append($("<td>").html(value["email"]));
-                        appendElement.append($("<td>").html(value["avatar"]));
+                        appendElement.append($("<td>").html("<img class='icon' src=\"../images/" + value["avatar"] + "\"/>"));
                         appendElement.append($("<td>").html(value["role"]["roleName"]));
                         appendElement.append($("<td>").html("<a  href=\"EditUser\?Id=" + value["userId"] + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
                     });

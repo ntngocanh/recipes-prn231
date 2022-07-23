@@ -1,11 +1,16 @@
 ﻿using BusinessObjects.DTO;
 using Microsoft.AspNetCore.Http;
+using BusinessObjects.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -24,6 +29,8 @@ namespace WebApp.Controllers
             UserApiUrl = "https://localhost:5001/api/Users";
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
         }
+     
+        
         public IActionResult Index()
         {
             return View();
@@ -60,6 +67,21 @@ namespace WebApp.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+        }
+
+       [HttpPut]
+        public async Task<IActionResult> RequestVIPAsync() {
+
+            var url = "https://localhost:5001/api/Users/RequestVIP" + SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId;
+            HttpResponseMessage response = await client.PutAsync("https://localhost:5001/api/Users/RequestVIP/"+ SessionExtension.Get<UserDTO>(HttpContext.Session,"user").UserId,null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Json("Successfully");
+                SessionExtension.Get<UserDTO>(HttpContext.Session, "user").RequestToVIP = false;
+
+            }
+            else return Json("Request fail!");
         }
     }
 }

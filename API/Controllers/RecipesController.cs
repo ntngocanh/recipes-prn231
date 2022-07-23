@@ -165,7 +165,10 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-
+            var comments = _context.Comments.Where(c => c.RecipeId == recipe.RecipeId);
+            var reactions = _context.Reactions.Where(c => c.RecipeId == recipe.RecipeId);
+            _context.Reactions.RemoveRange(reactions);
+            _context.Comments.RemoveRange(comments);
             _context.Recipes.Remove(recipe);
             await _context.SaveChangesAsync();
 
@@ -272,7 +275,7 @@ namespace API.Controllers
         [HttpGet("user/{id}")]
         public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
         {
-            return await _context.Recipes.Where(r => r.UserId == userId).ProjectTo<RecipeDTO>(config).ToListAsync();
+            return await _context.Recipes.Where(r => r.UserId == userId && r.RecipeStatus == RecipeStatus.Published).ProjectTo<RecipeDTO>(config).ToListAsync();
         }
         [HttpGet("search")]
         public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)

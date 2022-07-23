@@ -121,7 +121,7 @@
                         else {
                             raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
-                        raw += "<a href='../User/Details?Id=" + value["user"]["userId"] + "'> " + value["user"]["name"] +"</a>";
+                        raw += "<a href='../User/Profile?Id=" + value["user"]["userId"] + "'> " + value["user"]["name"] +"</a>";
                         raw += "<div class=\"card\" style=\"width: 15rem;\">";
                         raw += "<div class=\"card-body\">";
                         if (value["image"] == null) {
@@ -177,7 +177,7 @@
 
                         raw += "<h5 class=\"card-title\">" + value["user"]["name"] + "</h5>";
                         raw += "<p class=\"card-text\">Số Công Thức Đã Chia Sẻ: " + value["count"] + "</p>";
-                        raw += "<a href=\"../User/Details?Id=" + value["user"]["userId"] + "\" class=\"btn btn-primary\">View Details</a>";
+                        raw += "<a href=\"../User/Profile/" + value["user"]["userId"] + "\" class=\"btn btn-primary\">View Details</a>";
                         raw += "</div>";
                         raw += "</div>";
                         raw += "</div>";

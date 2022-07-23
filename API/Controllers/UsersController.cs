@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using API.DTO;
 using BusinessObjects.DTO;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace API.Controllers
 {
@@ -215,6 +218,50 @@ namespace API.Controllers
             }
             UserDTO userDTO = mapper.Map<User, UserDTO>(user);
             return userDTO;
+        }
+        // GET: api/Recipes/5
+        [Authorize]
+        [HttpGet("myprofile")]
+        public async Task<ActionResult<User>> GetMyProfile()
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            var user = await _context.Users
+                .FirstOrDefaultAsync(r => r.UserId == uId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return user;
+        }
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<User> patchEntity)
+        {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+
+            if (id != userId)
+            {
+                return Unauthorized();
+            }
+            var entity = _context.Users.FirstOrDefault(i => i.UserId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return NoContent();
         }
     }
 }

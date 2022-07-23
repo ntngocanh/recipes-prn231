@@ -153,11 +153,6 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("Test/{id}")]
-        public ActionResult Getest(int id)
-        {
-            var user = _context.Users.Include("Role").Include(x=>x.Recipes).SingleOrDefault(a => a.UserId == id);
-            return Ok(User);
-        }
+     
     }
 }

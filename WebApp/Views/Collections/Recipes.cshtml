@@ -6,15 +6,15 @@
     <br />
     <br />
     <br />
-
+    <form action="/Collections/Edit/@ViewBag.CollId" style="display:inline; float:right;">
+        <input type="submit" value="Edit" style="width:100px" class="btn btn-primary"/>
+    </form>
     <div class="row">
+    
         <div class="col-8"><p class="newestdish" id="collectionName" filter-content="S"></p></div>
     </div>
         <p style="margin:auto" id="collectionDesc"></p>
         <br>
-    @*<form action="/Collection/Edit/" asp-route-id="@ViewData["collId"]" style="display:inline">
-        <input type="submit" value="Edit" style="width:100px"/>
-    </form>*@
     <div id="newest" class="row">
     </div>
     <div style="align-content: center; display: flex">

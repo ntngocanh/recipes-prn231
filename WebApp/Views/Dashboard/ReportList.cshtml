@@ -38,10 +38,12 @@
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (result, status, xhr) {
+                alert("success");
                 showUser();
 
             },
             error: function (xhr, status, error) {
+                showUser();
                 console.log(xhr);
             }
 
@@ -58,7 +60,41 @@
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (result, status, xhr) {
+                alert("success");
                 showUser();
+
+            },
+            error: function (xhr, status, error) {
+                showUser();
+                console.log(xhr);
+            }
+
+        });
+    }
+    function showUser() {
+
+        $("table tbody").html("");
+        $.ajax({
+            url: "https://localhost:5001/api/Comments/Report",
+            type: "get",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result, status, xhr) {
+                $.each(result, function (index, value) {
+                    $("tbody").append($("<tr>"));
+                    appendElement = $("tbody tr").last();
+                    appendElement.append($("<td>").html(value["comment"]["user"]["name"]));
+                    appendElement.append($("<td>").html(value["comment"]["user"]["email"]));
+                    appendElement.append($("<td>").html(value["comment"]["text"]));
+                    appendElement.append($("<td>").html(value["text"]));
+                    //appendElement.append($("<td>").html(value["role"]["roleName"]));
+                    appendElement.append($("<td>").html("<a  href=\"../../Recipes/Details/2" + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
+                    appendElement.append($("<td>").html("<a onclick='accept(" + value["comment"]["commentId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
+                    appendElement.append($("<td>").html("<a onclick='reject(" + value["reportId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
+                });
+                var table = $('#example').DataTable();
+                table.clear();
+                $('#table').DataTable();
 
             },
             error: function (xhr, status, error) {
@@ -77,34 +113,6 @@
 
 
 
-        function showUser() {
-            $("table tbody").html("");
-            $.ajax({
-                url: "https://localhost:5001/api/Comments/Report",
-                type: "get",
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (result, status, xhr) {
-                    $.each(result, function (index, value) {
-                        $("tbody").append($("<tr>"));
-                        appendElement = $("tbody tr").last();
-                        appendElement.append($("<td>").html(value["comment"]["user"]["name"]));
-                        appendElement.append($("<td>").html(value["comment"]["user"]["email"]));
-                        appendElement.append($("<td>").html(value["comment"]["text"]));
-                        appendElement.append($("<td>").html(value["text"]));
-                        //appendElement.append($("<td>").html(value["role"]["roleName"]));
-                        appendElement.append($("<td>").html("<a  href=\"../../Recipes/Details/2" + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
-                        appendElement.append($("<td>").html("<a onclick='accept(" + value["comment"]["commentId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
-                        appendElement.append($("<td>").html("<a onclick='reject(" + value["reportId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
-                    });
-                    $('#table').DataTable();
-
-                },
-                error: function (xhr, status, error) {
-                    console.log(xhr);
-                }
-
-            });
-        }
+        
     });
 </script>

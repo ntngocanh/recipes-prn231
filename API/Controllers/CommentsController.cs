@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -159,7 +160,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{commentId}")]
         public IActionResult DeleteComment(int commentId)
         {
@@ -199,6 +200,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("Report/{reportId}")]
         public IActionResult DeleteReport(int reportId)
         {
@@ -216,7 +218,7 @@ namespace API.Controllers
                         return NotFound();
                     }
                     c.CommentStatus = CommentStatus.Posted;
-
+                    _context.Remove(report);
                     _context.SaveChanges();
                 }
                

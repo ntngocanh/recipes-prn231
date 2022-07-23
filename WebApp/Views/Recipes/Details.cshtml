@@ -1,6 +1,6 @@
 ﻿@model BusinessObjects.DTO.RecipeDTO
 @using Microsoft.AspNetCore.Http;
-
+@inject IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "Details";
 }
@@ -12,7 +12,19 @@
 <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
-        <hr />
+        <nav class="navbar">
+            <button class="btn btn-sm btn-outline-success" type="button" id="backBtn">Quay lại</button>
+            <div class="nav-item dropdown">
+                @if (ViewData["userId"] != null && (int)ViewData["userId"] == Model.UserId)
+                {
+                    <button type="button" class="btn btn-warning" id="edit-btn">Sửa</button>
+                    <span class="clickable deleteRecipe" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <span id="delete-recipe" style="cursor: pointer;">Xóa công thức</span>
+                    </div>
+                }
+            </div>
+        </nav>
     </div>
 </div>
 <div class="row">
@@ -54,7 +66,7 @@
             @foreach (var item in Model.Steps)
             {
                 <div class="step-div">
-                    <img src="~/images/fork-knife.png" class="step-icon"/>
+                    <img src="~/images/fork-knife.png" class="step-icon" />
                     <span>. @item.Text</span>
                     @if (item.Image != null && item.Image.Trim().Length > 0)
                     {
@@ -64,7 +76,7 @@
 
             }
         </div>
-        <hr/>
+        <hr />
         <div class="section">
             <div class="row">
                 <a href="#/" id="reaction-toggle" class="reaction-toggle" data-toggle="modal" data-target="#react-list-modal"></a>
@@ -133,7 +145,7 @@
                             <div class="col-lg-2 dropdown-section">
                                 <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    @if (ViewData["userId"] !=null && (int)ViewData["userId"] == comment.User.UserId)
+                                    @if (ViewData["userId"] != null && (int)ViewData["userId"] == comment.User.UserId)
                                     {
                                         <div class="delCmt" id="del-comment-@comment.CommentId">Xóa bình luận</div>
                                         <div class="editCmt" id="edit-comment-@comment.CommentId">Sửa bình luận</div>
@@ -192,35 +204,35 @@
                 </div>
             </div>
         </div>
-            <div class="modal" id="report-modal">
-                <div class="modal-content" id="report-modal-content">
-                    <span class="close" id="report-modal-close">&times;</span>
-                    <p>Báo cáo comment này?</p>
-                    <input type="number" class="reportCommentIdTxt" id="reportCommentId" style="display:none">
-                    <div class="form-group">
-                        <label for="Title">Hãy nêu lí do tại sao bạn báo cáo comment này.</label>
-                        <input type="text" name="" id="reportText" class="form-control">
-                    </div>
-                    <div class="text-center panel-body">
-                        <button type="submit" class="btn btn-sm btn-primary" id="ReportButton">Báo cáo comment</button>
-                    </div>
+        <div class="modal" id="report-modal">
+            <div class="modal-content" id="report-modal-content">
+                <span class="close" id="report-modal-close">&times;</span>
+                <p>Báo cáo comment này?</p>
+                <input type="number" class="reportCommentIdTxt" id="reportCommentId" style="display:none">
+                <div class="form-group">
+                    <label for="Title">Hãy nêu lí do tại sao bạn báo cáo comment này.</label>
+                    <input type="text" name="" id="reportText" class="form-control">
+                </div>
+                <div class="text-center panel-body">
+                    <button type="submit" class="btn btn-sm btn-primary" id="ReportButton">Báo cáo comment</button>
                 </div>
             </div>
-            <div class="modal" id="coll-modal">
-                <div class="modal-content" id="coll-modal-content">
-                    <span class="close" id="coll-modal-close">&times;</span>
-                    <p>Add to a Collection</p>
-                    <table cellspacing="0" cellpadding="0" style="border: none;">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+        </div>
+        <div class="modal" id="coll-modal">
+            <div class="modal-content" id="coll-modal-content">
+                <span class="close" id="coll-modal-close">&times;</span>
+                <p>Add to a Collection</p>
+                <table cellspacing="0" cellpadding="0" style="border: none;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
+        </div>
     </div>
     <div class="col-md-2">
         <div style="display:none" id="recipe-id">@Model.RecipeId</div>
@@ -228,6 +240,28 @@
 </div>
 <script src="~/js/reactions.js"></script>
 <script type="text/javascript">
+    $("#edit-btn").on("click", function () {
+        window.location.href = "/Recipes/Edit/" + @Model.RecipeId;
+    });
+    $("#delete-recipe").on("click", function () {
+        if (confirm("Do you really want to delete this recipe?")) {
+
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+                type: "delete",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    window.location.href = "/Home/Index";
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        }
+    });
     $(document).ready(function () {
         if (!'@ViewData["userId"]') {
             $("#comment-input").prop('disabled', true);
@@ -773,41 +807,41 @@
             });
     </script>
     <style>
-          .modal {
-          display: none;
-          position: fixed;
-          z-index: 1;
-          padding-top: 100px;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          overflow: auto;
-          background-color: rgb(0, 0, 0);
-          background-color: rgba(0, 0, 0, .4);
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, .4);
         }
 
         .modal-content {
-          background-color: #fefefe;
-          margin: auto;
-          padding: 20px;
-          border: 1px solid #888;
-          width: 80%;
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
         }
 
         .close {
-          color: #aaaaaa;
-          float: right;
-          font-size: 28px;
-          font-weight: bold;
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        .close:hover,
-        .close:focus {
-          color: #000;
-          text-decoration: none;
-          cursor: pointer;
-        }
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
     </style>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

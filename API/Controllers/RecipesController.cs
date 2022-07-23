@@ -257,13 +257,23 @@ namespace API.Controllers
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
                 yield return day;
         }
-        // GET: api/Recipes
-        [HttpGet("user/{userId}")]
+        // recipes by a user
+        [Authorize]
+        [HttpGet("myrecipes")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetMyRecipes()
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            return await _context.Recipes.Where(r => r.UserId == uId).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
+        [HttpGet("user/{id}")]
         public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
         {
             return await _context.Recipes.Where(r => r.UserId == userId).ProjectTo<RecipeDTO>(config).ToListAsync();
         }
-
         [HttpGet("search")]
         public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)
         {
@@ -277,7 +287,7 @@ namespace API.Controllers
             }
             var configuration = new MapperConfiguration(cf => cf.AddProfile(new RecipeProfile()));
 
-            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString));
+            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString) && DateTime.Compare(x.DateCreated, parameters.MinDate) >= 0 && DateTime.Compare(x.DateCreated, parameters.MaxDate) <= 0 && x.RecipeStatus == RecipeStatus.Published);
             List<RecipeDTO> recipeDTOs = recipesList.ProjectTo<RecipeDTO>(configuration).ToList();
             recipeDTOs.Sort((x, y) => y.Popularity.CompareTo(x.Popularity));
             var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOs.AsQueryable(), parameters.PageNumber, parameters.PageSize);

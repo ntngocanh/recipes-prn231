@@ -10,7 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WebApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link id="sitecss" rel="stylesheet" href="~/css/site.css" /><script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <link id="sitecss" rel="stylesheet" href="~/css/site.css" />
+    <script src="https://kit.fontawesome.com/43dcc20e7a.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 </head>
 <body>
     <div>
@@ -25,8 +27,10 @@
 
                     </ul>
                     <div class="nav-item"></div>
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input style="margin-left: 50px"  class="form-control me-2 search-input" type="search" placeholder="Tìm kiếm công thức" aria-label="Search" id="search-input">
+                    <button class="btn search-button" id="search-button" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
 
                 </div>
                 @if (@HttpContextAccessor.HttpContext.Session.GetString("user") != null)
@@ -126,8 +130,12 @@
         $("#create-btn").on("click", function () {
                 window.location.href = "/Recipes/Draft";
         });
+        $("#search-button").on("click", function () {
+            var searchString = $("#search-input").val();
+            window.location.href = "/Home/Search?searchQuery=" + searchString;
+        });
         $("#profile-btn").on("click", function () {
-            window.location.href = "/User/MyProfile";
+            window.location.href = "/User/MyProfile/MyRecipes";
         });
     </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

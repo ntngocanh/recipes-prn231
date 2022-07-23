@@ -1,5 +1,6 @@
 ﻿using API.DTO;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
@@ -249,6 +250,12 @@ namespace API.Controllers
         private int CountRecipes(int collectionId)
         {
             return _context.CollectionRecipes.Where(x => x.CollectionId == collectionId).ToList().Count;
+        }
+        // recipes by a user
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<CollectionDTO>>> GetCollectionsByUserId(int userId)
+        {
+            return await _context.Collections.Where(r => r.UserId == userId).ProjectTo<CollectionDTO>(config).ToListAsync();
         }
     }
 }

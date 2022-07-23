@@ -21,6 +21,7 @@ namespace WebApp.Controllers
         private readonly HttpClient client = null;
         private string UserApiUrl = ""; 
         private string RecipesApiUrl = "";
+        private string CollectionApiUrl = "";
         public UserController()
         {
             client = new HttpClient();
@@ -28,6 +29,7 @@ namespace WebApp.Controllers
             client.DefaultRequestHeaders.Accept.Add(contentType);
             UserApiUrl = "https://localhost:5001/api/Users";
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
+            CollectionApiUrl = "https://localhost:5001/api/Collections";
         }
      
         
@@ -39,6 +41,7 @@ namespace WebApp.Controllers
         public IActionResult Details(int Id) {
             return View();
         }
+
         public async Task<IActionResult> Profile(int id)
         {
             HttpResponseMessage response = await client.GetAsync(UserApiUrl + "/" + id);
@@ -56,20 +59,69 @@ namespace WebApp.Controllers
             ViewBag.Recipes = recipes;
             return View(user);
         }
-        public async Task<IActionResult> MyProfile()
+        [HttpGet("user/myprofile/myrecipes")]
+        public async Task<IActionResult> MyRecipes()
         {
-            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
-            if (user != null)
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
             {
-                return RedirectToAction("Profile", new { id = user.UserId });
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            UserDTO currentUser = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (currentUser != null)
+            {
+                HttpResponseMessage response = await client.GetAsync(UserApiUrl + "/" + currentUser.UserId);
+                string strData = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                UserDTO user = JsonSerializer.Deserialize<UserDTO>(strData, options);
+
+                //get recipes by user
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                response = await client.GetAsync(RecipesApiUrl + "/myrecipes");
+                string strData2 = await response.Content.ReadAsStringAsync();
+                List<RecipeDTO> recipes = JsonSerializer.Deserialize<List<RecipeDTO>>(strData2, options);
+                ViewBag.Recipes = recipes;
+                return View(user);
             }
             else
             {
                 return RedirectToAction("Index", "Home");
             }
         }
+        [HttpGet("user/myprofile/mycollections")]
+        public async Task<IActionResult> MyCollections()
+        {
+            UserDTO currentUser = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (currentUser != null)
+            {
+                HttpResponseMessage response = await client.GetAsync(UserApiUrl + "/" + currentUser.UserId);
+                string strData = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                UserDTO user = JsonSerializer.Deserialize<UserDTO>(strData, options);
 
-       [HttpPut]
+                //get recipes by user
+                response = await client.GetAsync(CollectionApiUrl + "/user/" + currentUser.UserId);
+                string strData2 = await response.Content.ReadAsStringAsync();
+                List<CollectionDTO> collections = JsonSerializer.Deserialize<List<CollectionDTO>>(strData2, options);
+                ViewBag.Collections = collections;
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+        [HttpPut]
         public async Task<IActionResult> RequestVIPAsync() {
 
             var url = "https://localhost:5001/api/Users/RequestVIP" + SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId;

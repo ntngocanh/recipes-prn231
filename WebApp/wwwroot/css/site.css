@@ -121,3 +121,40 @@ body {
     display: inline-block;
     text-decoration:underline;
 }
+
+.sidenav {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 200px; /* Set the width of the sidebar */
+    align-content: center;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    left: 0;
+    background-color: white; /* Black */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+    margin-bottom: 61px;
+}
+
+.sidenav div{
+    margin: auto;
+}
+.main {
+    margin-top: 40px; /* Same as the width of the sidebar */
+
+    margin-left: 200px; /* Same as the width of the sidebar */
+    padding: 0px 10px;
+}
+
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.child{
+  flex: 1 0 15%; /* explanation below */
+  margin: 10px
+}
+
+.card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

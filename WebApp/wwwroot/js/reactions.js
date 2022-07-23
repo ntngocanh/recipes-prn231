@@ -44,7 +44,7 @@ function fillReactList() {
             $.each(result, function (index, value) {
                 var htmlContent = `<div class="row flex-row">
                                 <div class="avatar avatar-sm rounded-circle">
-                                        <img class="avatar-img" src="/images/`+ value["user"]["avatar"] + `" alt="">
+                                        <img class="avatar-img" src="/images/fromUsers/`+ value["user"]["avatar"] + `" alt="">
                                     </div>
                                 <div>` + value["user"]["name"] +`</div>
                                 </div>`;

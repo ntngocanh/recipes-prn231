@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -41,59 +44,47 @@ namespace API.Controllers
             return ingredient;
         }
 
-        
-        // PUT: api/Ingredients/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutIngredient(int id, Ingredient ingredient)
-        {
-            if (id != ingredient.IngredientId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(ingredient).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!IngredientExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         // POST: api/Ingredients
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Ingredient>> PostIngredient(Ingredient ingredient)
+        public async Task<ActionResult<int>> PostIngredient(Ingredient ingredient)
         {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            Recipe recipe = _context.Recipes.FirstOrDefault(r => r.RecipeId == ingredient.RecipeId);
+            if(recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Ingredients.Add(ingredient);
             await _context.SaveChangesAsync();
 
-            return ingredient;
+            return ingredient.IngredientId;
         }
 
         // DELETE: api/Ingredients/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIngredient(int id)
         {
-            var ingredient = await _context.Ingredients.FindAsync(id);
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            var ingredient = await _context.Ingredients.Include(i => i.Recipe).FirstOrDefaultAsync(i => i.IngredientId == id);
             if (ingredient == null)
             {
                 return NotFound();
             }
-
+            if (ingredient.Recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Ingredients.Remove(ingredient);
             await _context.SaveChangesAsync();
 
@@ -103,6 +94,31 @@ namespace API.Controllers
         private bool IngredientExists(int id)
         {
             return _context.Ingredients.Any(e => e.IngredientId == id);
+        }
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Ingredient> patchEntity)
+        {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+
+            var entity = _context.Ingredients.Include(i => i.Recipe).FirstOrDefault(i => i.IngredientId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if (entity.Recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return NoContent();
         }
     }
 }

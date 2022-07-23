@@ -17,7 +17,5 @@ namespace WebApp.Models
         public string Duration { get; set; }
         public IFormFile Image { get; set; }
         public DateTime DateCreated { get; set; }
-        public virtual ICollection<IngredientDTO> Ingredients { get; set; }
-        public virtual ICollection<StepDTO> Steps { get; set; }
     }
 }

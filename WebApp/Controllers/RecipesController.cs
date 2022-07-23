@@ -1,15 +1,18 @@
 ﻿using BusinessObjects.DTO;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WebApp.Models;
 
 namespace WebApp.Controllers
 {
@@ -17,8 +20,8 @@ namespace WebApp.Controllers
     {
         private readonly HttpClient client = null;
         private string RecipesApiUrl = "";
+        private string IngredientsApiUrl = "";
         private string CommentApiUrl = "";
-
 
         public RecipesController()
         {
@@ -26,6 +29,7 @@ namespace WebApp.Controllers
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             RecipesApiUrl = "https://localhost:5001/api/Recipes";
+            IngredientsApiUrl = "https://localhost:5001/api/Ingredients";
             CommentApiUrl = "https://localhost:5001/api/Comments";
         }
         public IActionResult Index()
@@ -35,7 +39,11 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Details(int id)
         {
             UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
-            ViewData["userId"] = user.UserId;
+            if (user!= null)
+            {
+                ViewData["userId"] = user.UserId;
+
+            }
             HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
@@ -49,10 +57,34 @@ namespace WebApp.Controllers
             ViewBag.Comments = comments;
             return View(recipe);
         }
-        //public async Task<IActionResult> Create()
-        //{
-        //    return View();
-        //}
+        public async Task<IActionResult> Draft()
+        {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/drafts");
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                List<RecipeDTO> recipes = JsonSerializer.Deserialize<List<RecipeDTO>>(data, options);
+                return View(recipes);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
         public async Task<IActionResult> Create()
         {
             Recipe recipe = new Recipe()
@@ -88,6 +120,17 @@ namespace WebApp.Controllers
         }
         public async Task<IActionResult> Edit(int id)
         {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
@@ -95,7 +138,32 @@ namespace WebApp.Controllers
                 PropertyNameCaseInsensitive = true
             };
             RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
-            return View(recipe);
+            if(recipe != null)
+            {
+                return View(recipe);
+            }
+            return RedirectToAction("Error", "Home");
         }
+        [HttpPost]
+        public async Task<JsonResult> UploadImage([FromServices] IHostingEnvironment hostingEnvironment)
+        {
+            string uniqueFileName = null;
+            if (Request.Form.Files.Count != 0)
+            {
+                var image = Request.Form.Files[0];
+
+                string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images/fromUsers");
+
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+
+                using (var fs = new FileStream(Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create))
+                {
+                    await image.CopyToAsync(fs);
+                }
+                //return Json(image);
+            }
+            return Json(uniqueFileName);
+        }
+        
     }
 }

@@ -26,8 +26,11 @@
             </div>
         }
         <div class="section">
-            <div class="form-group">
+            <div class="form-group" style="display:inline">
                 <span asp-for="Name" id="nameBox">@Model.Name</span>
+            </div>
+            <div style="float:right; display:inline">
+                <img src="~/images/AddToCollection.png" height="50" alt="Add To Collection" class="addToColl">
             </div>
             <div class="form-group">
                 <span id="descriptionBox" asp-for="Description"></span>
@@ -60,6 +63,23 @@
                 </div>
 
             }
+        </div>
+        <hr/>
+        <div class="section">
+            <div class="row flex-row px-3">
+                <button type="button" id="heart-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/heart-reaction.png"></span>
+                    <span id="heart-react-count"></span>
+                </button>
+                <button type="button" id="yummy-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/yummy-reaction.png"></span>
+                    <span id="yummy-react-count"></span>
+                </button>
+                <button type="button" id="clap-react-btn" class="react-btn">
+                    <span><img width="20" src="~/images/clap-reaction.png"></span>
+                    <span id="clap-react-count"></span>
+                </button>
+            </div>
         </div>
         <hr />
         <div class="section">
@@ -94,16 +114,15 @@
                                         <div class="commentId">@comment.CommentId</div>
                                         <div id="comment-content-@comment.CommentId">@comment.Text</div>
                                         <div>
-                                            <a href="#/" id="reply-btn-@comment.CommentId" class="reply">Reply</a>
+                                            <a href="#/" id="reply-to-@comment.CommentId" class="reply">Reply</a>
                                         </div>
                                         @if (comment.NumberOfReplies > 0)
                                         {
                                             <div>
                                                 <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show @comment.NumberOfReplies replies</b></a>
                                             </div>
-                                            <div class="replies-section"></div>
                                         }
-
+                                        <div class="replies-section" id="replies-section-@comment.CommentId"></div>
                                     </div>
 
                                 </div>
@@ -111,7 +130,7 @@
                             <div class="col-lg-2 dropdown-section">
                                 <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    @if ((int)ViewData["userId"] == comment.User.UserId)
+                                    @if (ViewData["userId"] !=null && (int)ViewData["userId"] == comment.User.UserId)
                                     {
                                         <div class="delCmt" id="del-comment-@comment.CommentId">Xóa bình luận</div>
                                         <div class="editCmt" id="edit-comment-@comment.CommentId">Sửa bình luận</div>
@@ -127,9 +146,9 @@
             </div>
 
         </div>
-            <div class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
+            <div class="modal" id="report-modal">
+                <div class="modal-content" id="report-modal-content">
+                    <span class="close" id="report-modal-close">&times;</span>
                     <p>Báo cáo comment này?</p>
                     <input type="number" class="reportCommentIdTxt" id="reportCommentId" style="display:none">
                     <div class="form-group">
@@ -141,13 +160,169 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="coll-modal">
+                <div class="modal-content" id="coll-modal-content">
+                    <span class="close" id="coll-modal-close">&times;</span>
+                    <p>Add to a Collection</p>
+                    <table cellspacing="0" cellpadding="0" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
     </div>
     <div class="col-md-2">
         <div style="display:none" id="recipe-id">@Model.RecipeId</div>
     </div>
 </div>
-
+<script src="~/js/reactions.js"></script>
 <script type="text/javascript">
+    $(document).ready(function () {
+        if (!'@ViewData["userId"]') {
+            $("#comment-input").prop('disabled', true);
+            $(".comment-post-btn").prop('disabled', true);
+            $(".reply").prop('disabled', true);
+            $(".reply").hide();
+            $(".delCmt").prop('disabled', true);
+            $(".delCmt").hide();
+            $(".react-btn").prop('disabled', true);
+        }
+        if ('@ViewData["userId"]') {
+            GetCurrentUserReact('@ViewData["userId"]', $("#recipe-id").text());
+        }
+    });
+
+    $(".react-btn").on("click", function () {
+        var newReactionType;
+        if ($(this).attr("id") == "heart-react-btn") {
+            newReactionType = 0;
+        }
+        if ($(this).attr("id") == "yummy-react-btn") {
+            newReactionType = 1;
+        }
+        if ($(this).attr("id") == "clap-react-btn") {
+            newReactionType = 2;
+        }
+        console.log("new type" + newReactionType);
+        var oldReactionType;
+        $.ajax({
+            url: "https://localhost:5001/api/Reactions/getByUserAndRecipe/" + $("#recipe-id").text() + "/" + '@ViewData["userId"]',
+            method: 'get',
+            contentType: "application/json",
+            statusCode: {
+                404: function () {
+                    var postJson = {
+                        userId: '@ViewData["userId"]',
+                        recipeId: $("#recipe-id").text(),
+                        reactionType: newReactionType
+                    };
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'post',
+                        contentType: "application/json",
+                        data: JSON.stringify(postJson),
+                        success: function (result, status, xhr) {
+                            switch (postJson.reactionType) {
+                                case 0:
+                                    $("#heart-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yum-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").addClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                }
+            },
+            success: function (result, status, xhr) {
+                oldReactionType = result["reactionType"];
+                console.log('old type' + oldReactionType);
+                var json = {
+                    userId: result["userId"],
+                    recipeId: result["recipeId"],
+                    reactionType: oldReactionType
+                };
+                if (oldReactionType != newReactionType) {
+                    json.reactionType = newReactionType;
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'put',
+                        contentType: "application/json",
+                        data: JSON.stringify(json),
+                        success: function (result, status, xhr) {
+                            switch (oldReactionType) {
+                                case 0:
+                                    $("#heart-react-btn").attr("class", "react-btn");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").attr("class", "react-btn");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").attr("class", "react-btn");
+                                    break;
+                            }
+                            switch (newReactionType) {
+                                case 0:
+                                    $("#heart-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").addClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").addClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: "https://localhost:5001/api/Reactions",
+                        method: 'delete',
+                        contentType: "application/json",
+                        data: JSON.stringify(json),
+                        success: function (result, status, xhr) {
+                            switch (json.reactionType) {
+                                case 0:
+                                    $("#heart-react-btn").removeClass("react-btn-active");
+                                    break;
+                                case 1:
+                                    $("#yummy-react-btn").removeClass("react-btn-active");
+                                    break;
+                                case 2:
+                                    $("#clap-react-btn").removeClass("react-btn-active");
+                                    break;
+                            }
+                            getReactionsCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr);
+                        }
+                    });
+                }
+                getReactionsCount();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+        getReactionsCount();
+    });
 
     var textarea = document.getElementById("comment-input");
     var limit = 200;
@@ -209,17 +384,16 @@
                             value["text"]
                             + `</div>
 <div>
-                                                        <a href="#/" class="reply">Reply</a>`;
+                                                        <a href="#/" class="reply" id="reply-to-` + value["commentId"] + `">Reply</a>`;
                         if (result["numberOfReplies"] > 0) {
                             htmlContent += `<div>
 
                                                             <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show ` + result["numberOfReplies"] + ` replies</b></a>
 
-                                                            </div>
-                                                            <div class="replies-section"></div>`
+                                                            </div>`
                         }
 
-                        htmlContent += `
+                        htmlContent += `<div class="replies-section"  id="replies-section-` + value["commentId"] + `"></div>
                                                     </div>
                                                         </div></div>
                                                     </div>
@@ -240,6 +414,12 @@
                                                     </div>`;
                         $("<div>").addClass("container").html(htmlContent);
                         repliesSection.html(htmlContent);
+                        if (!'@ViewData["userId"]') {
+                            $(".reply").prop('disabled', true);
+                            $(".reply").hide();
+                            $(".delCmt").prop('disabled', true);
+                            $(".delCmt").hide();
+                        }
                     });
 
                 },
@@ -255,7 +435,7 @@
             var textvalue = $(this).parent().find("div:nth-child(2)").find(":first-child").val();
             if (textvalue) {
                 var json = {
-                    userId: 2,
+                    userId: '@ViewData["userId"]',
                     recipeId: $("#recipe-id").text(),
                     parentCommentId: null,
                     text: $(this).parent().find("div:nth-child(2)").find(":first-child").val(),
@@ -292,9 +472,9 @@
                                     <div class="col-lg-2 dropdown-section">
                                 <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <div class="delCmt" id="del-comment-` + value["commentId"] + `">Xóa bình luận</div>
-                                        <div class="editCmt" id="edit-comment-` + value["commentId"] +`">Sửa bình luận</div>
-                                        <div class="reportCmt" id="report-comment-` + value["commentId"] +`">Báo cáo bình luận</div>
+                                        <div class="delCmt" id="del-comment-` + result["commentId"] + `">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + result["commentId"] +`">Sửa bình luận</div>
+                                        <div class="reportCmt" id="report-comment-` + result["commentId"] +`">Báo cáo bình luận</div>
 
                                 </div>
                             </div>
@@ -317,7 +497,7 @@
             var commentBox = $("#comment-content-" + id);
             commentContent = $("#comment-content-" + id).text();
             var htmlContent = `<div class="row flex-row align-items-center" id="comment-box">
-                
+
                 <div class="">
                     <textarea rows="1" id="comment-input-` + id+ `" class="comment-input textarea form-rounded" role="textbox" contenteditable>` + $("#comment-content-" + id).text() + `</textarea>
                 </div>
@@ -325,7 +505,7 @@
                 <button id="comment-cancel-`+ id +`" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
             </div>`;
             commentBox.html(htmlContent);
-            
+
         });
 
         $(document).on("click", '[id^="comment-edit-"]', function () {
@@ -351,23 +531,117 @@
         });
 
         $(document).on("click", '[id^="comment-cancel-"]', function () {
-            console.log("click");
             var id = $(this).attr("id").replace("comment-cancel-", "");
             var commentBox = $("#comment-content-" + id);
 
             commentBox.html(commentContent);
         });
 
-            
+        $(document).on("click", '[id^="reply-to-"]', function () {
+            var id = $(this).attr("id").replace("reply-to-", "");
+            var commentbox = $("#comment-content-" + id).closest(".row").parent();
 
-        $(document).ready(function () {
+            var htmlContent = `<div>
+
+                <div class="row">
+                    <textarea rows="1" id="reply-input-` + id + `" class="comment-input textarea form-rounded" role="textbox" contenteditable></textarea>
+                </div>
+                </div>
+            <div class="row flex-row">
+                <button id="reply-post-`+ id + `" class="comment-post-btn float-left btn" type="button">Post</button>
+                <button id="reply-cancel-`+ id + `" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
+            </div>`;
+            $("<div>").attr("id", "reply-box-" + id).attr("class", "reply-box").html(htmlContent).appendTo(commentbox);
+        });
+
+        $(document).on("click", '[id^="reply-cancel-"]', function () {
+            var id = $(this).attr("id").replace("reply-cancel-", "");
+            var commentBox = $("#reply-box-" + id);
+            $(commentBox).hide();
+        });
+
+        $(document).on("click", '[id^="reply-post-"]', function () {
+            var id = $(this).attr("id").replace("reply-post-", "");
+            var replyContent = $("#reply-input-" + id);
+            var json = {
+                userId: '@ViewData["userId"]',
+                recipeId: $("#recipe-id").text(),
+                parentCommentId: id,
+                text: replyContent.val(),
+                commentStatus: 0
+            };
+            var htmlContent = "";
+            console.log(json);
+            $.ajax({
+                url: "https://localhost:5001/api/Comments",
+                type: "post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (result, status, xhr) {
+                    htmlContent += `<div class="row">
+                                        <div class="col-lg-10">
+                                                <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="avatar avatar-sm rounded-circle">
+                                                                <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1 comment-content">
+                                                            <div class="d-flex align-items-baseline">
+                                                                <h6 class="me-2">` + result["user"]["name"] + `</h6>
+                                                            </div>
+                                                            <div class="commentId">` + result["commentId"] + `</div>
+                                                            <div>` +
+                        result["text"]
+                        + `</div>
+<div>
+                                                        <a href="#" class="reply">Reply</a>
+                                                </div>
+                                                            </div> </div></div>
+                                    <div class="col-lg-2 dropdown-section">
+                                <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="delCmt" id="del-comment-` + result["commentId"] + `">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + result["commentId"] + `">Sửa bình luận</div>
+                                        <div class="reportCmt" id="report-comment-` + result["commentId"] + `">Báo cáo bình luận</div>
+
+                                </div>
+                            </div>
+                                                        </div>`;
+                    $("<div>").addClass("container").html(htmlContent).appendTo($("#replies-section-" + id));
+                    $("#reply-box-" + id).hide();
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        $(document).on("click", '[id^="report-comment-"]', function () {
           var commentidtxt = $('.reportCommentIdTxt');
-          var modal = $('.modal');
+          var modal = $("#report-modal");
           var btn = $('.reportCmt');
-          var span = $('.close');
-          var commentid = btn.attr("id").replace("report-comment-", "");
+          var span = $("#report-modal-close");
+          var commentid = $(this).attr("id").replace("report-comment-", "");
 
           $("#reportCommentId").val(commentid);
+
+            modal.show();
+
+          span.click(function () {
+            modal.hide();
+          });
+
+          $(window).on('click', function (e) {
+            if ($(e.target).is("#report-modal")) {
+              modal.hide();
+            }
+          });
+        });
+        $(document).ready(function () {
+          var modal = $("#coll-modal");
+          var btn = $('.addToColl');
+          var span = $("#coll-modal-close");
 
           btn.click(function () {
             modal.show();
@@ -378,11 +652,12 @@
           });
 
           $(window).on('click', function (e) {
-            if ($(e.target).is('.modal')) {
+            if ($(e.target).is("#coll-modal")) {
               modal.hide();
             }
           });
         });
+
         $("#ReportButton").click(function(e) {
             data = new FormData();
             data.append("CommentId", $("#reportCommentId").val());
@@ -397,7 +672,7 @@
                 contentType: "application/json",
                 success: function(result, status, xhr) {
                     console.log(status);
-                    var modal = $('.modal');
+                    var modal = $("#report-modal");
                     modal.hide();
                 },
                 error: function(xhr, status, error) {
@@ -405,6 +680,51 @@
                 }
             });
         });
+
+        $("table tbody").html("");
+            $.ajax({
+                url: "https://localhost:5001/api/Collections/getByUser/" + @ViewData["userId"] + "/" + @Model.RecipeId,
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function(result, status, xhr) {
+                    $.each(result, function(index, value) {
+                        $("tbody").append($("<tr>"));
+                        appendElement = $("tbody tr").last();
+                        appendElement.append($("<td>"));
+                        buttonElement = $("tbody td").last();
+                        buttonElement.append($("<button style='margin:5px' class='btn btn-sm btn-primary' id='addcoll-" + value["collectionId"] + "'>").html(value["name"]));
+                        appendElement.append($("<td>").html(value["description"]));
+
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                }
+
+            });
+            $(document).on("click", '[id^="addcoll-"]', function () {
+                data = new FormData();
+                data.append("CollectionId", $(this).attr("id").replace("addcoll-", ""));
+                data.append("RecipeId", @Model.RecipeId);
+                var object = {};
+                data.forEach((value, key) => object[key] = value);
+                console.log(JSON.stringify(object))
+                $.ajax({
+                    url: "https://localhost:5001/api/Recipes/addToCollection/",
+                    type: "post",
+                    data: JSON.stringify(object),
+                    contentType: "application/json",
+                    success: function(result, status, xhr) {
+                        console.log(status);
+                        var modal = $("#coll-modal");
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+            });
     </script>
     <style>
           .modal {

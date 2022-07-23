@@ -1,0 +1,51 @@
+﻿body {
+    background-color: #F8F6F2;
+}
+.section {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align:center;
+    padding: 50px;
+}
+.section div{
+    margin-top: 20px;
+    font-size: 20px;
+}
+.section .bold{
+    font-size: 23px;
+    margin-top:30px;
+}
+.section button{
+    margin-top: 25px;
+}
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.fill {
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 150px;
+    padding:0;
+}
+    .fill img {
+        height: 150px;
+        object-fit: cover;
+    }
+.card-body{
+    padding:0;
+    margin: 10px;
+    height: 100px;
+    font-weight:500;
+    overflow:hidden;
+}
+.card{
+    display: inline-block;
+    width: 24%;
+    cursor: pointer;
+}

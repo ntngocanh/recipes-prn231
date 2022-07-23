@@ -19,7 +19,8 @@ namespace API.DTO
             CreateMap<Comment, CommentDTO>();
             CreateMap<CommentRequest, Comment>();
             CreateMap<Collection, CollectionDTO>();
-
+            CreateMap<Reaction, ReactionDTO>();
+            CreateMap<ReactionRequestDTO, Reaction>();
         }
     }
 }

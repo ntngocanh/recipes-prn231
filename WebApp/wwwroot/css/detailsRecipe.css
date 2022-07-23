@@ -120,3 +120,33 @@ input {
 .dropdown-section {
     padding-top: 15px;
 }
+
+.react-btn {
+    border: 1px solid grey;
+    border-radius: 20px;
+    color: black;
+    padding: 5px 5px;
+    margin: 0px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.react-btn-active {
+    border: 1px solid orange;
+    background-color: white;
+    border-radius: 20px;
+    font-weight: bold;
+    color: orangered;
+    padding: 5px 5px;
+    margin: 0px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.reply-box{
+    margin: 0 60px;
+}

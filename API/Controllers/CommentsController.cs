@@ -230,7 +230,7 @@ namespace API.Controllers
         }
         private int CountReplies(int commentId)
         {
-            return _context.Comments.Where(x => x.ParentCommentId == commentId).ToList().Count;
+            return _context.Comments.Where(x => x.ParentCommentId == commentId && x.CommentStatus != CommentStatus.Hidden).ToList().Count;
         }
     }
 }

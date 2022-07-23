@@ -1,0 +1,47 @@
+﻿@model IEnumerable<BusinessObjects.DTO.RecipeDTO>
+
+    <link rel="stylesheet" href="~/css/draftRecipes.css" />
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="section">
+                <img src="~/images/new-dish.svg"></img>
+                <div class="font-weight-bold bold">Viết gì đó mới</div>
+                <div>Truyền cảm hứng vào bếp của bạn đến mọi người nào!</div>
+                <button type="button" class="btn btn-outline-dark" id="create-new">+ Thêm món</button>
+            </div>
+            <div class="">
+                @foreach (var item in Model)
+                {
+
+                    <div class="card" id="card-@item.RecipeId">
+                        <div class="fill">
+                            @if (item.Image != null && item.Image.Trim().Length > 0)
+                            {
+                                <img src="~/images/fromUsers/@item.Image" class="card-img-top" alt="...">
+                            }
+                            else
+                            {
+                                <img src="~/images/empty-dish.png" class="card-img-top" alt="...">
+                            }
+                        </div>
+                        <div class="card-body">
+                            <div>@item.Name</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+<script>
+    $("#create-new").on("click", function () {
+        window.location.href = "/Recipes/Create";
+    });
+    $(document).on("click", '[id^="card-"]', function () {
+        window.location.href = "/Recipes/Edit/" + $(this).attr("id").replace("card-", "");;
+    });
+</script>
+    @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

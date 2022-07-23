@@ -15,5 +15,6 @@ namespace BusinessObjects.DTO
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public int NumberOfRecipes { get; set; }
+        public string Image { get; set; }
     }
 }

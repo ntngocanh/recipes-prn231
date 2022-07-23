@@ -10,6 +10,9 @@ using AutoMapper;
 using API.DTO;
 using BusinessObjects.Models;
 using BusinessObjects.DTO;
+using Microsoft.AspNetCore.JsonPatch;
+using AutoMapper.QueryableExtensions;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -118,42 +121,22 @@ namespace API.Controllers
             return recipeDTO;
         }
 
-        // PUT: api/Recipes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRecipe(int id, Recipe recipe)
-        {
-            if (id != recipe.RecipeId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(recipe).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RecipeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Recipe>> PostRecipe(Recipe recipe)
         {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            if(recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
@@ -162,16 +145,13 @@ namespace API.Controllers
 
         //Add Recipe to Collection
 
-        [HttpPost("addToCollection/{collectionId}")]
-        public async Task<ActionResult<Recipe>> PostToCollection(int collectionId, Recipe recipe)
+        [HttpPost("addToCollection")]
+        public async Task<ActionResult<Recipe>> PostToCollection(CollectionRecipe cr)
         {
-            CollectionRecipe cr = new CollectionRecipe();
-            cr.CollectionId = collectionId;
-            cr.RecipeId = recipe.RecipeId;
             _context.CollectionRecipes.Add(cr);
             await _context.SaveChangesAsync();
 
-            return recipe;
+            return Ok();
         }
 
         // DELETE: api/Recipes/5
@@ -209,6 +189,67 @@ namespace API.Controllers
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
+        [Authorize]
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Recipe> patchEntity)
+        {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+
+            var entity = _context.Recipes.FirstOrDefault(r => r.RecipeId == id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if(entity.UserId != userId)
+            {
+                return Unauthorized();
+            }
+            patchEntity.ApplyTo(entity);
+            _context.SaveChanges();
+
+            return Ok(entity);
+        }
+
+        // GET: api/Recipes
+        [Authorize]
+        [HttpGet("drafts")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetDraftRecipes()
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            return await _context.Recipes.Where(r => r.UserId == uId && r.RecipeStatus == RecipeStatus.Draft).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
+        [Authorize]
+        [HttpGet("edit/{recipeId}")]
+        public async Task<ActionResult<RecipeDTO>> GetRecipeToEdit(int recipeId)
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            var recipe = await _context.Recipes
+                .Include(r => r.User)
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .FirstOrDefaultAsync(r => r.RecipeId == recipeId && r.UserId == uId);
+
+            if (recipe == null)
+            {
+                return NotFound();
+            }
+            RecipeDTO recipeDTO = mapper.Map<Recipe, RecipeDTO>(recipe);
+            return recipeDTO;
+        }
+
         private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
         {
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))

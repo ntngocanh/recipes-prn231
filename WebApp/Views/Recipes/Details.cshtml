@@ -112,7 +112,7 @@
                                 <div class="d-flex px-3 py-4">
                                     <div class="flex-shrink-0">
                                         <div class="avatar avatar-sm rounded-circle">
-                                            <img class="avatar-img" src="/images/@comment.User.Avatar" alt="">
+                                            <img class="avatar-img" src="/images/fromUsers/@comment.User.Avatar" alt="">
                                         </div>
                                     </div>
                                     <div class="ms-2 ms-md-8 comment-content">
@@ -440,7 +440,7 @@
                                                     <div class="d-flex">
                                                         <div class="flex-shrink-0">
                                                             <div class="avatar avatar-sm rounded-circle">
-                                                                <img class="avatar-img" src="/images/` + value["user"]["avatar"] + `" alt="">
+                                                                <img class="avatar-img" src="/images/fromUsers/` + value["user"]["avatar"] + `" alt="">
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1 comment-content">
@@ -527,7 +527,7 @@
                                                 <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
                                                         <div class="flex-shrink-0">
                                                             <div class="avatar avatar-sm rounded-circle">
-                                                                <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                                <img class="avatar-img" src="/images/fromUsers/` + result["user"]["avatar"] + `" alt="">
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1 comment-content">
@@ -558,7 +558,7 @@
                         console.log(xhr);
                     }
                 });
-                $(this).parent().find("div:nth-child(2)").find(":first-child").val("");
+                $("#comment-input").val("");
             }
 
         });
@@ -662,7 +662,7 @@
                                                 <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
                                                         <div class="flex-shrink-0">
                                                             <div class="avatar avatar-sm rounded-circle">
-                                                                <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                                <img class="avatar-img" src="/images/fromUsers/` + result["user"]["avatar"] + `" alt="">
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1 comment-content">

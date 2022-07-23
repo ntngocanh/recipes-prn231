@@ -6,16 +6,16 @@
 }
 <div id="searchQuery" style="display:none">@ViewBag.SearchString</div>
 <div class="sidenav">
-    <h6 class="center">Lọc kết quả</h6>
-    <div>
+    <h5 class="center" style="text-align: center">Lọc kết quả</h5>
+    <div style="text-align: center">
         <div>Từ ngày</div>
         <input type="date" placeholder="dd-mm-yyyy" id="dt1" value="@ViewBag.FromDate">
     </div>
-    <div>
+    <div style="text-align: center">
         <div>Đến ngày</div>
         <input type="date" placeholder="dd-mm-yyyy" id="dt2" value="@ViewBag.ToDate">
     </div>
-    <button class="btn" id="filter-btn">Lọc</button>
+    <button style="margin: 10px 70px; border: 2px solid grey" class="btn" id="filter-btn">Lọc</button>
 </div>
 <div class="main">
     <div id="searchResult" class="parent">
@@ -28,7 +28,7 @@
                     <img src="../Images/@item.Image" class=" img-circle thumbnail" alt="...">
                     <h5 class="card-title">@item.Name</h5>
                     <p class="card-text">@item.Description</p>
-                    <a href="../Recipes/Details/@item.RecipeId" class="btn btn-primary">View Details</a>
+                    <a href="../Recipes/Details/@item.RecipeId" class="btn btn-primary btn-details">View Details</a>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
     
     var pageNumber = 2;
     $(window).scroll(function () {
-        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+        if ($(window).scrollTop() > $(document).height() - $(window).height() - 50) {
             console.log("scroll");
             var fromDate = $("#dt1").val();
             var toDate = $("#dt2").val();
@@ -100,6 +100,8 @@
                     $("<div>").attr("class", "child").html(htmlContent).appendTo($("#searchResult"));
                 });
                 pageNumber++;
+                $("html, body").animate({ scrollTop: "0px" });
+
             },
             error: function (xhr, status, error) {
                 console.log(xhr);
@@ -107,3 +109,14 @@
         });
     });
 </script>
+
+<style>
+    .card-body {
+        height: 250px;
+    }
+
+    .btn-details {
+        position: absolute;
+        bottom: 10px;
+    }
+    </style>

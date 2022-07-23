@@ -65,8 +65,8 @@ namespace WebApp.Controllers
                 { "SearchString", searchQuery },
                 { "pageNumber", "1" },
                 { "pageSize", "15" },
-                { "fromDate", MinDate.ToString("yyyy-MM-dd") },
-                { "toDate", MaxDate.ToString("yyyy-MM-dd") },
+                { "MinDate", MinDate.ToString("yyyy-MM-dd") },
+                { "MaxDate", MaxDate.ToString("yyyy-MM-dd") },
 
             };
             var dictFormUrlEncoded = new FormUrlEncodedContent(request);

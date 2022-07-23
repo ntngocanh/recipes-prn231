@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Create";
+}
+<link rel="stylesheet" href="~/css/editRecipe.css" />
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <form>
+            <div class="section">
+                <div class="text-danger"></div>
+                <div class="form-group">
+                    <label for="Name">Tên collection</label>
+                    <input class="form-control" id="nameBox" placeholder="Đồ ăn mùa hè" />
+                </div>
+                <div class="form-group">
+                    <label for="Description">Thông tin mô tả</label>
+                    <textarea id="descriptionBox" class="form-control" placeholder="Hãy chia sẻ với mọi người về collection này của bạn nhé - ai đã truyền cảm hứng cho bạn, tại sao nó đặc biệt?"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button id="collectionCreate" class="btn btn-primary">Tạo mới</button>
+            </div>
+            <div>
+                <a id="back" href="">Back to List</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+        
+        $("#collectionCreate").click(function(e) {
+            data = new FormData();
+            data.append("Name", $("#nameBox").val());
+            data.append("Description", $("#descriptionBox").val());
+            data.append("UserId", @ViewData["userId"]);
+            
+            var object = {};
+            data.forEach((value, key) => object[key] = value);
+            console.log(JSON.stringify(object))
+            $.ajax({
+                url: "https://localhost:5001/api/Collections",
+                type: "post",
+                data: JSON.stringify(object),
+                processData: false,
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    console.log(status)
+                    $("#back")[0].click();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        });
+    });
+</script>

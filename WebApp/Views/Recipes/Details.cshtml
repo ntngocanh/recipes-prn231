@@ -435,7 +435,7 @@
             var textvalue = $(this).parent().find("div:nth-child(2)").find(":first-child").val();
             if (textvalue) {
                 var json = {
-                    userId: 2,
+                    userId: '@ViewData["userId"]',
                     recipeId: $("#recipe-id").text(),
                     parentCommentId: null,
                     text: $(this).parent().find("div:nth-child(2)").find(":first-child").val(),

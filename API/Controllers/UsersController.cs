@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.DTO;
+using BusinessObjects.DTO;
+using AutoMapper;
+
 namespace API.Controllers
 {
     [Route("api/[controller]")]
@@ -14,9 +17,13 @@ namespace API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly RecipeDbContext _context;
+        private MapperConfiguration config;
+        private IMapper mapper;
         public UsersController(RecipeDbContext context)
         {
             _context = context;
+            config = new MapperConfiguration(cf => cf.AddProfile(new MapperProfile()));
+            mapper = config.CreateMapper();
         }
         //Get All Users
         [HttpGet]
@@ -171,6 +178,19 @@ namespace API.Controllers
             }
         }
 
-     
+        // GET: api/Recipes/5
+        [HttpGet("profile/{id}")]
+        public async Task<ActionResult<UserDTO>> GetUserById(int id)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(r => r.UserId == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            UserDTO userDTO = mapper.Map<User, UserDTO>(user);
+            return userDTO;
+        }
     }
 }

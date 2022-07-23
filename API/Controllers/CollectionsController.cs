@@ -26,31 +26,55 @@ namespace API.Controllers
             mapper = config.CreateMapper();
         }
 
-//Get All Collections of user
+//Get All Collections of user by page
 
-        [HttpGet("getByUser/{userId}")]
-        public IActionResult GetByUser(int userId)
+        [HttpGet("getByUserPaged/{userId}/{page}")]
+        public IActionResult GetByUserPaged(int userId, int page)
         {
+            int totalCount = _context.Collections.Where(x => x.UserId == userId).Count();
+            int count = 4 * page;
             if (_context.Users.FirstOrDefault(x => x.UserId == userId) == null)
             {
                 return NotFound();
             }
-            List<Collection> collections = _context.Collections.Where(x => x.UserId == userId).ToList();
+            List<Collection> collections = _context.Collections.Include("User").Where(x => x.UserId == userId).ToList();
             if (collections == null)
             {
                 return NotFound();
             }
             List<CollectionDTO> collectionDTOs = collections.Select(m => mapper.Map<Collection, CollectionDTO>(m)).ToList();
-            foreach (CollectionDTO c in collectionDTOs)
+            List<CollectionDTO> collectionToDisplay = new List<CollectionDTO>();
+
+            if (count <= totalCount)
+                for (int i = count - 4; i < count; i++)
+                {
+                    collectionToDisplay.Add(collectionDTOs[i]);
+                }
+            else
+                for (int i = count - 4; i < totalCount; i++)
+                {
+                    collectionToDisplay.Add(collectionDTOs[i]);
+                }
+
+            foreach (CollectionDTO c in collectionToDisplay)
             {
-                //string image = _context.Recipes.FirstOrDefault(x => x.RecipeId == _context.CollectionRecipes
-                //                          .FirstOrDefault(x => x.CollectionId == c.CollectionId).RecipeId)
-                //                          .Image;
-                //if (image!=null)
-                //    c.Image = image;
-                c.NumberOfRecipes = CountRecipes(c.CollectionId);
+                CollectionRecipe cr = _context.CollectionRecipes.FirstOrDefault(x => x.CollectionId == c.CollectionId);
+                if (cr != null)
+                {
+                    Recipe r = _context.Recipes.FirstOrDefault(x => x.RecipeId == cr.RecipeId);
+                    string image = r.Image;
+                    if (image.Length > 0)
+                        c.Image = image;
+                    c.NumberOfRecipes = CountRecipes(c.CollectionId);
+                }
             }
-            return Ok(collectionDTOs);
+            return Ok(collectionToDisplay);
+        }
+
+        [HttpGet("getCountByUser/{userId}")]
+        public IActionResult GetCountByUser(int userId)
+        {
+            return Ok(_context.Collections.Where(x => x.UserId == userId).Count());
         }
 
 //Get All Collections of user without recipe
@@ -90,9 +114,12 @@ namespace API.Controllers
 
 //Get All Recipes of Collection
 
-        [HttpGet("GetRecipes/{collectionId}")]
-        public IActionResult GetRecipesByCollection(int collectionId)
+        [HttpGet("GetRecipes/{collectionId}/{page}")]
+        public IActionResult GetRecipesByCollection(int collectionId, int page)
         {
+
+            int totalCount = _context.CollectionRecipes.Where(x => x.CollectionId == collectionId).Count();
+            int count = 4 * page;
             if (_context.Collections.FirstOrDefault(x => x.CollectionId == collectionId) == null)
             {
                 return NotFound();
@@ -106,10 +133,23 @@ namespace API.Controllers
             List<Recipe> recipes = new List<Recipe>();
             foreach (var item in collectionRecipes)
             {
-                recipes.Add(_context.Recipes.FirstOrDefault(x => x.RecipeId == item.RecipeId));
+                recipes.Add(_context.Recipes.Include("User").FirstOrDefault(x => x.RecipeId == item.RecipeId));
             }
             List<RecipeDTO> recipeDTOs = recipes.Select(m => mapper.Map<Recipe, RecipeDTO>(m)).ToList();
-            return Ok(recipeDTOs);
+            List<RecipeDTO> recipeToDisplay = new List<RecipeDTO>();
+
+            if (count <= totalCount)
+                for (int i = count - 4; i < count; i++)
+                {
+                    recipeToDisplay.Add(recipeDTOs[i]);
+                }
+            else
+                for (int i = count - 4; i < totalCount; i++)
+                {
+                    recipeToDisplay.Add(recipeDTOs[i]);
+                }
+
+            return Ok(recipeToDisplay);
         }
 
 //Get Collection

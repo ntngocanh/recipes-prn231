@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Http;
 @using BusinessObjects.DTO;
 @inject IHttpContextAccessor HttpContextAccessor
+@using BusinessObjects.DTO;
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,7 +51,7 @@
                         <img src="~/images/plus-icon.png" />
                         <span>Viết món mới</span>
                     </div>
-                    <div class="d-flex right-item">
+                    <div class="d-flex right-item" id="profile-btn">
                         <img src="~/images/avatar.jpg" />
                         <span>Bếp cá nhân</span>
                     </div>
@@ -110,6 +111,9 @@
         });
         $("#create-btn").on("click", function () {
                 window.location.href = "/Recipes/Draft";
+        });
+        $("#profile-btn").on("click", function () {
+            window.location.href = "/User/MyProfile";
         });
     </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

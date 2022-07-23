@@ -33,6 +33,7 @@ namespace API
         {
             services.AddDbContext<RecipeDbContext>(options =>
             {
+                options.EnableSensitiveDataLogging();
                 options.UseSqlServer(Configuration.GetConnectionString("RecipeDB"));
             });
             services.AddCors();

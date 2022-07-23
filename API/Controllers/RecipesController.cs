@@ -257,10 +257,20 @@ namespace API.Controllers
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
                 yield return day;
         }
+        // GET: api/Recipes
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
+        {
+            return await _context.Recipes.Where(r => r.UserId == userId).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
 
         [HttpGet("search")]
         public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)
         {
+            if (parameters.SearchString == null)
+            {
+                parameters.SearchString = "";
+            }
             if (!parameters.ValidYearRange)
             {
                 return BadRequest("Max date cannot be less than min date");
@@ -268,8 +278,9 @@ namespace API.Controllers
             var configuration = new MapperConfiguration(cf => cf.AddProfile(new RecipeProfile()));
 
             IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString));
-            IQueryable<RecipeDTO> recipeDTOQueryable = recipesList.ProjectTo<RecipeDTO>(configuration);
-            var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOQueryable, parameters.PageNumber, parameters.PageSize);
+            List<RecipeDTO> recipeDTOs = recipesList.ProjectTo<RecipeDTO>(configuration).ToList();
+            recipeDTOs.Sort((x, y) => y.Popularity.CompareTo(x.Popularity));
+            var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOs.AsQueryable(), parameters.PageNumber, parameters.PageSize);
             var metadata = new
             {
                 recipes.TotalCount,

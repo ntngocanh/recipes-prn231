@@ -16,6 +16,7 @@
 }
 .section .bold{
     font-size: 23px;
+    margin-top:30px;
 }
 .section button{
     margin-top: 25px;
@@ -30,6 +31,7 @@ img {
     align-items: center;
     overflow: hidden;
     height: 150px;
+    padding:0;
 }
     .fill img {
         height: 150px;

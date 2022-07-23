@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Edit";
 }
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
 <link rel="stylesheet" href="~/css/editRecipe.css" />
 
 <div class="row">
@@ -29,7 +31,15 @@
                     <input type="file" asp-for="Image" accept="image/*" id="input-recipe-image" />
                 </div>
                 <div class="fill">
-                    <img src="~/images/@Model.Image" height="200" alt="Image preview..." id="recipe-image">
+                    @if (Model.Image != null && Model.Image.Trim().Length > 0)
+                    {
+
+                        <img src="~/images/fromUsers/@Model.Image" height="200" alt="Image preview..." id="recipe-image">
+                    }
+                    else
+                    {
+                        <img src="~/images/empty-dish.png" height="200" alt="Image preview..." id="recipe-image">
+                    }
                 </div>
                 <div class="form-group">
                     <input asp-for="Name" class="form-control" id="nameBox" placeholder="Tên món: Bánh bột mì" />
@@ -41,7 +51,7 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <label asp-for="Duration" class="control-label"></label>
+                        <label asp-for="Duration" class="control-label">Thời gian nấu</label>
                     </div>
                     <div class="col-6">
                         <input asp-for="Duration" class="form-control" placeholder="1 tiếng 30 phút" id="durationBox" />
@@ -93,7 +103,7 @@
                                 <td>
                                     @if (item.Image != null && item.Image.Trim().Length > 0)
                                     {
-                                        <img class="step-img" src="~/images/@item.Image" id="img-step-@item.StepId" />
+                                        <img class="step-img" src="~/images/fromUsers/@item.Image" id="img-step-@item.StepId" />
                                     }
                                     else
                                     {
@@ -127,6 +137,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
                 type: "delete",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json",
                 success: function (result, status, xhr) {
                     window.location.href = "/Home/Index";
@@ -172,13 +185,15 @@
             }
         });
     });
-    //recipe information changed
 
+    //recipe name changed
     $(document).on("change", '#nameBox', function() {
-        console.log("name changed");
         $.ajax({
             url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "name",
@@ -199,6 +214,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "description",
@@ -218,6 +236,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "image",
@@ -237,6 +258,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "duration",
@@ -259,6 +283,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Ingredients/" + id,
                 type: "delete",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json",
                 success: function (result, status, xhr) {
                     $("#ingre-" + id).remove();
@@ -277,6 +304,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Steps/" + id,
                 type: "delete",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json",
                 success: function (result, status, xhr) {
                     $("#step-" + id).remove();
@@ -288,6 +318,7 @@
             });
         }
     });
+    //add an ingredient
     $("#addIngredientBtn").on("click", function () {
         $("#ingredientsTable").append(
             '<tr id="ingre-new"><td><input type="text" placeholder="250g bột" class="form-control" id="val-ingre-new"/></td><td><span class="clickable deleteIngredient" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteIngre" id="del-ingre-new">Xóa nguyên liệu</span></div></td></tr>');
@@ -295,6 +326,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Ingredients",
             type: "post",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify({
                 IngredientId: 0,
                 RecipeId: @Model.RecipeId
@@ -302,9 +336,9 @@
             processData: false,
             contentType: "application/json",
             success: function (result, status, xhr) {
-                $("#ingre-new").attr("id", "ingre-" + result["ingredientId"]);
-                $("#del-ingre-new").attr("id", "del-ingre-" + result["ingredientId"]);
-                $("#val-ingre-new").attr("id", "val-ingre-" + result["ingredientId"]);
+                $("#ingre-new").attr("id", "ingre-" + result);
+                $("#del-ingre-new").attr("id", "del-ingre-" + result);
+                $("#val-ingre-new").attr("id", "val-ingre-" + result);
                 console.log("ingredient added");
             },
             error: function (xhr, status, error) {
@@ -312,11 +346,15 @@
             }
         });
     });
+    //add a step
     $("#addStepBtn").on("click", function () {
         $("#stepsTable").append('<tr id="step-new"><td><input type="text" id="val-step-new" placeholder="Trộn bột và nước đến khi đặc lại" class="form-control"/></td><td><span class="clickable deleteStep" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span><div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><span class="deleteStep" id="del-step-new">Xóa bước này</span></div></td></tr><tr id="step-img-section-new"><td><img class="step-img-null" id="img-step-null-new" /><input type="file" asp-for="Image" accept="image/*" id="input-step-image-new" /></td></tr>');
         $.ajax({
             url: "https://localhost:5001/api/Steps",
             type: "post",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify({
                 StepId: 0,
                 RecipeId: @Model.RecipeId
@@ -324,13 +362,13 @@
             processData: false,
             contentType: "application/json",
             success: function (result, status, xhr) {
-                $("#step-new").prop("id", "step-" + result["stepId"]);
-                $("#del-step-new").prop("id", "del-step-" + result["stepId"]);
-                $("#val-step-new").prop("id", "val-step-" + result["stepId"]);
-                $("#step-img-section-new").prop("id", "step-img-section-" + result["stepId"]);
+                $("#step-new").prop("id", "step-" + result);
+                $("#del-step-new").prop("id", "del-step-" + result);
+                $("#val-step-new").prop("id", "val-step-" + result);
+                $("#step-img-section-new").prop("id", "step-img-section-" + result);
                 $("#img-step-null-new").prop("src", "/images/camera.jpg");
-                $("#img-step-null-new").prop("id", "img-step-" + result["stepId"]);
-                $("#input-step-image-new").attr("id", "input-step-image-" + result["stepId"]);
+                $("#img-step-null-new").prop("id", "img-step-" + result);
+                $("#input-step-image-new").attr("id", "input-step-image-" + result);
             },
             error: function (xhr, status, error) {
                 console.log(xhr);
@@ -340,12 +378,15 @@
     $(document).on("change", '[id^="val-ingre-"]', function () {
         $.ajax({
             url: "https://localhost:5001/api/Ingredients/" + $(this).attr("id").replace("val-ingre-", ""),
-            type: "put",
-            data: JSON.stringify({
-                IngredientId: $(this).attr("id").replace("val-ingre-", ""),
-                RecipeId: @Model.RecipeId,
-                Text: $(this).val()
-            }),
+            type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "text",
+                "value": $(this).val()
+            }]),
             processData: false,
             contentType: 'application/json',
             success: function (result, status, xhr) {
@@ -360,6 +401,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Steps/" + stepId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "text",
@@ -416,6 +460,9 @@
         $.ajax({
             url: "https://localhost:5001/api/Steps/" + stepId,
             type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
             data: JSON.stringify([{
                 "op": "replace",
                 "path": "image",

@@ -267,7 +267,7 @@ namespace API.Controllers
             }
             var configuration = new MapperConfiguration(cf => cf.AddProfile(new RecipeProfile()));
 
-            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions);
+            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString));
             IQueryable<RecipeDTO> recipeDTOQueryable = recipesList.ProjectTo<RecipeDTO>(configuration);
             var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOQueryable, parameters.PageNumber, parameters.PageSize);
             var metadata = new

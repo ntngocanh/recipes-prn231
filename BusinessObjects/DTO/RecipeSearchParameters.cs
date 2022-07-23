@@ -10,6 +10,7 @@ namespace BusinessObjects.DTO
     {
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;
+        public string SearchString { get; set; }
         private int _pageSize = 10;
         public int PageSize
         {

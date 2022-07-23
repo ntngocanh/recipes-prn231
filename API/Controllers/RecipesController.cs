@@ -273,9 +273,9 @@ namespace API.Controllers
             return await _context.Recipes.Where(r => r.UserId == uId).ProjectTo<RecipeDTO>(config).ToListAsync();
         }
         [HttpGet("user/{id}")]
-        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int id)
         {
-            return await _context.Recipes.Where(r => r.UserId == userId && r.RecipeStatus == RecipeStatus.Published).ProjectTo<RecipeDTO>(config).ToListAsync();
+            return await _context.Recipes.Where(r => r.UserId == id && r.RecipeStatus == RecipeStatus.Published).ProjectTo<RecipeDTO>(config).ToListAsync();
         }
         [HttpGet("search")]
         public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)

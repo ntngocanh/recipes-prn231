@@ -65,8 +65,9 @@ namespace WebApp.Controllers
             if (user != null)
             {
                 ViewData["userId"] = user.UserId;
-
             }
+            else
+                ViewData["userId"] = 0;
             return View();
         }
         public async Task<IActionResult> Edit(int id)
@@ -75,8 +76,9 @@ namespace WebApp.Controllers
             if (user != null)
             {
                 ViewData["userId"] = user.UserId;
-
             }
+            else
+                ViewData["userId"] = 0;
             HttpResponseMessage response = await client.GetAsync(CollectionApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
@@ -87,14 +89,17 @@ namespace WebApp.Controllers
             return View(collection);
         }
 
-        public IActionResult MyCollections()
+        public IActionResult MyCollections(int id)
         {
             UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
             if (user != null)
             {
-                ViewData["userId"] = user.UserId;
-
+                ViewData["loggedUserId"] = user.UserId;
             }
+            else
+                ViewData["loggedUserId"] = 0;
+
+            ViewData["userId"] = id;
             return View();
         }
         public IActionResult Recipes(int id)
@@ -103,9 +108,11 @@ namespace WebApp.Controllers
             if (user != null)
             {
                 ViewData["userId"] = user.UserId;
-                ViewData["collId"] = id;
-                ViewBag.CollId = id;
             }
+            else
+                ViewData["userId"] = 0;
+            ViewData["collId"] = id;
+            ViewBag.CollId = id;
             return View();
         }
     }

@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "My Collections";
+}
+
+<div class="container">
+    <br />
+    <br />
+    <br />
+
+    <div class="row">
+        <div class="col-8"><p><span class="newestdish" filter-content="S">Những bộ sưu tầm của tôi</span></p></div>
+    </div>
+    <div id="newest" class="row">
+    </div>
+    <div style="align-content: center; display: flex">
+        @*<button class="btn btn-primary" style="margin:auto" id="newColl">Hiển thị thêm</button>*@
+        <p style="margin:auto" id="endWarning">Bạn đã đến cuối trang</p>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        
+        $("#endWarning").hide();
+        var count = 0;
+        showCollections();
+        showCollections();
+        $.noConflict();
+
+        window.onscroll = function(ev) {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                showCollections();
+            }
+        };
+
+
+
+        //$(window).scroll(function() {
+        //   if($(window).scrollTop() + $(window).height() == $(document).height()) {
+        //        showCollections();
+        //   }
+        //});
+
+        //$("#newColl").click(function(e) {
+        //    showCollections();
+        //});
+        function showCollections() {
+            count = count + 1;
+            $.ajax({
+                url: "https://localhost:5001/api/Collections/getByUserPaged/" + @ViewData["userId"] + "/" + count,
+                type: "get",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function(result, status, xhr) {
+                    if (!$.trim(result)){
+                        $("#endWarning").show();
+                        //$("#newColl").hide();
+                    }
+                    $.each(result, function(index, value) {
+
+                        appendElement = $("#newest");
+                        let raw = ""
+
+                        raw += "<div class='col-3'>";
+
+                        if (value["user"]["avatar"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+                        raw += "<a href='../User/Details?Id=" + value["user"]["userId"] + "'> " + value["user"]["name"] + "</a>";
+                        raw += "<div class=\"card\" style=\"width: 15rem;\">";
+                        raw += "<div class=\"card-body\">";
+                        if (value["image"] == null) {
+                            raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
+                        }
+                        else {
+                            raw += "<img src='" + "../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                        }
+
+                        raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";
+                        raw += "<p class=\"card-text\">" + value["description"] + "</p>";
+                        //raw += "<a href=\"../Recipes/Details/" + value["recipeId"] + "\" class=\"btn btn-primary\">View Details</a>";
+                        raw += "</div>";
+                        raw += "</div>";
+                        raw += "</div><br>";
+                        console.log(raw);
+                        appendElement.append(raw);
+                    });
+
+
+                },
+                error: function(xhr, status, error) {
+                    
+                }
+
+            });
+        }
+    });
+</script>

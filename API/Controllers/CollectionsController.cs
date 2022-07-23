@@ -26,16 +26,18 @@ namespace API.Controllers
             mapper = config.CreateMapper();
         }
 
-//Get All Collections of user
+//Get All Collections of user by page
 
-        [HttpGet("getByUser/{userId}")]
-        public IActionResult GetByUser(int userId)
+        [HttpGet("getByUserPaged/{userId}/{page}")]
+        public IActionResult GetByUserPaged(int userId, int page)
         {
+            int totalCount = _context.Collections.Where(x => x.UserId == userId).Count();
+            int count = 4 * page;
             if (_context.Users.FirstOrDefault(x => x.UserId == userId) == null)
             {
                 return NotFound();
             }
-            List<Collection> collections = _context.Collections.Where(x => x.UserId == userId).ToList();
+            List<Collection> collections = _context.Collections.Include("User").Where(x => x.UserId == userId).ToList();
             if (collections == null)
             {
                 return NotFound();
@@ -50,7 +52,25 @@ namespace API.Controllers
                 //    c.Image = image;
                 c.NumberOfRecipes = CountRecipes(c.CollectionId);
             }
-            return Ok(collectionDTOs);
+            List<CollectionDTO> collectionToDisplay = new List<CollectionDTO>();
+
+            if (count <= totalCount)
+                for (int i = count - 4; i < count; i++)
+                {
+                    collectionToDisplay.Add(collectionDTOs[i]);
+                }
+            else
+                for (int i = count - 4; i < totalCount; i++)
+                {
+                    collectionToDisplay.Add(collectionDTOs[i]);
+                }
+            return Ok(collectionToDisplay);
+        }
+
+        [HttpGet("getCountByUser/{userId}")]
+        public IActionResult GetCountByUser(int userId)
+        {
+            return Ok(_context.Collections.Where(x => x.UserId == userId).Count());
         }
 
 //Get All Collections of user without recipe

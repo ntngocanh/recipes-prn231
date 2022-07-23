@@ -22,5 +22,7 @@ namespace API.DTO
             CreateMap<Reaction, ReactionDTO>();
             CreateMap<ReactionRequestDTO, Reaction>();
         }
+
+
     }
 }

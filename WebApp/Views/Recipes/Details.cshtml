@@ -114,16 +114,15 @@
                                         <div class="commentId">@comment.CommentId</div>
                                         <div id="comment-content-@comment.CommentId">@comment.Text</div>
                                         <div>
-                                            <a href="#/" id="reply-btn-@comment.CommentId" class="reply">Reply</a>
+                                            <a href="#/" id="reply-to-@comment.CommentId" class="reply">Reply</a>
                                         </div>
                                         @if (comment.NumberOfReplies > 0)
                                         {
                                             <div>
                                                 <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show @comment.NumberOfReplies replies</b></a>
                                             </div>
-                                            <div class="replies-section"></div>
                                         }
-
+                                        <div class="replies-section" id="replies-section-@comment.CommentId"></div>
                                     </div>
 
                                 </div>
@@ -385,17 +384,16 @@
                             value["text"]
                             + `</div>
 <div>
-                                                        <a href="#/" class="reply">Reply</a>`;
+                                                        <a href="#/" class="reply" id="reply-to-` + value["commentId"] + `">Reply</a>`;
                         if (result["numberOfReplies"] > 0) {
                             htmlContent += `<div>
 
                                                             <a class="show-replies" href="#/"><i class="fa-solid fa-angle-down"></i><b>Show ` + result["numberOfReplies"] + ` replies</b></a>
 
-                                                            </div>
-                                                            <div class="replies-section"></div>`
+                                                            </div>`
                         }
 
-                        htmlContent += `
+                        htmlContent += `<div class="replies-section"  id="replies-section-` + value["commentId"] + `"></div>
                                                     </div>
                                                         </div></div>
                                                     </div>
@@ -416,6 +414,12 @@
                                                     </div>`;
                         $("<div>").addClass("container").html(htmlContent);
                         repliesSection.html(htmlContent);
+                        if (!'@ViewData["userId"]') {
+                            $(".reply").prop('disabled', true);
+                            $(".reply").hide();
+                            $(".delCmt").prop('disabled', true);
+                            $(".delCmt").hide();
+                        }
                     });
 
                 },
@@ -468,9 +472,9 @@
                                     <div class="col-lg-2 dropdown-section">
                                 <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <div class="delCmt" id="del-comment-` + value["commentId"] + `">Xóa bình luận</div>
-                                        <div class="editCmt" id="edit-comment-` + value["commentId"] +`">Sửa bình luận</div>
-                                        <div class="reportCmt" id="report-comment-` + value["commentId"] +`">Báo cáo bình luận</div>
+                                        <div class="delCmt" id="del-comment-` + result["commentId"] + `">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + result["commentId"] +`">Sửa bình luận</div>
+                                        <div class="reportCmt" id="report-comment-` + result["commentId"] +`">Báo cáo bình luận</div>
 
                                 </div>
                             </div>
@@ -527,15 +531,91 @@
         });
 
         $(document).on("click", '[id^="comment-cancel-"]', function () {
-            console.log("click");
             var id = $(this).attr("id").replace("comment-cancel-", "");
             var commentBox = $("#comment-content-" + id);
 
             commentBox.html(commentContent);
         });
 
+        $(document).on("click", '[id^="reply-to-"]', function () {
+            var id = $(this).attr("id").replace("reply-to-", "");
+            var commentbox = $("#comment-content-" + id).closest(".row").parent();
 
+            var htmlContent = `<div>
 
+                <div class="row">
+                    <textarea rows="1" id="reply-input-` + id + `" class="comment-input textarea form-rounded" role="textbox" contenteditable></textarea>
+                </div>
+                </div>
+            <div class="row flex-row">
+                <button id="reply-post-`+ id + `" class="comment-post-btn float-left btn" type="button">Post</button>
+                <button id="reply-cancel-`+ id + `" class="comment-cancel-btn float-right btn" type="button">Cancel</button>
+            </div>`;
+            $("<div>").attr("id", "reply-box-" + id).attr("class", "reply-box").html(htmlContent).appendTo(commentbox);
+        });
+
+        $(document).on("click", '[id^="reply-cancel-"]', function () {
+            var id = $(this).attr("id").replace("reply-cancel-", "");
+            var commentBox = $("#reply-box-" + id);
+            $(commentBox).hide();
+        });
+
+        $(document).on("click", '[id^="reply-post-"]', function () {
+            var id = $(this).attr("id").replace("reply-post-", "");
+            var replyContent = $("#reply-input-" + id);
+            var json = {
+                userId: '@ViewData["userId"]',
+                recipeId: $("#recipe-id").text(),
+                parentCommentId: id,
+                text: replyContent.val(),
+                commentStatus: 0
+            };
+            var htmlContent = "";
+            console.log(json);
+            $.ajax({
+                url: "https://localhost:5001/api/Comments",
+                type: "post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (result, status, xhr) {
+                    htmlContent += `<div class="row">
+                                        <div class="col-lg-10">
+                                                <div class="d-flex px-3 py-4 border border-bottom-0 border-light rounded-top border-left">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="avatar avatar-sm rounded-circle">
+                                                                <img class="avatar-img" src="/images/` + result["user"]["avatar"] + `" alt="">
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1 comment-content">
+                                                            <div class="d-flex align-items-baseline">
+                                                                <h6 class="me-2">` + result["user"]["name"] + `</h6>
+                                                            </div>
+                                                            <div class="commentId">` + result["commentId"] + `</div>
+                                                            <div>` +
+                        result["text"]
+                        + `</div>
+<div>
+                                                        <a href="#" class="reply">Reply</a>
+                                                </div>
+                                                            </div> </div></div>
+                                    <div class="col-lg-2 dropdown-section">
+                                <span class="clickable delCmt" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="delCmt" id="del-comment-` + result["commentId"] + `">Xóa bình luận</div>
+                                        <div class="editCmt" id="edit-comment-` + result["commentId"] + `">Sửa bình luận</div>
+                                        <div class="reportCmt" id="report-comment-` + result["commentId"] + `">Báo cáo bình luận</div>
+
+                                </div>
+                            </div>
+                                                        </div>`;
+                    $("<div>").addClass("container").html(htmlContent).appendTo($("#replies-section-" + id));
+                    $("#reply-box-" + id).hide();
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        });
 
         $(document).on("click", '[id^="report-comment-"]', function () {
           var commentidtxt = $('.reportCommentIdTxt');
@@ -546,9 +626,7 @@
 
           $("#reportCommentId").val(commentid);
 
-          btn.click(function () {
             modal.show();
-          });
 
           span.click(function () {
             modal.hide();
@@ -617,7 +695,7 @@
                         buttonElement = $("tbody td").last();
                         buttonElement.append($("<button style='margin:5px' class='btn btn-sm btn-primary' id='addcoll-" + value["collectionId"] + "'>").html(value["name"]));
                         appendElement.append($("<td>").html(value["description"]));
-                        
+
                     });
                 },
                 error: function(xhr, status, error) {

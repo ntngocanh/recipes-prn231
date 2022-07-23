@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessObjects.DTO
@@ -13,6 +14,7 @@ namespace BusinessObjects.DTO
         public string Name { get; set; }
         public string Description { get; set; }
         public int UserId { get; set; }
+        [JsonIgnore]
         public virtual User User { get; set; }
         public int NumberOfRecipes { get; set; }
         public string Image { get; set; }

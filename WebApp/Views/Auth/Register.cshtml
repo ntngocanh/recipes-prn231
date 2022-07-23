@@ -4,10 +4,55 @@
     ViewData["Title"] = "Register";
     Layout = "_Layout";
 }
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/login.css">
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 mx-auto">
+                <div id="first">
+                    <div class="myform form ">
+                        <div class="logo mb-3">
+                            <div class="col-md-12 text-center">
+                                <h1>Register</h1>
+                            </div>
+                        </div>
+                        <form method="post" enctype="multipart/form-data">
+                            <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                            <div class="form-group">
+                                <label asp-for="Name" for="exampleInputEmail1"></label>
+                                <input asp-for="Name" class="form-control" id="name" aria-describedby="emailHelp" >
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email" for="exampleInputEmail1"></label>
+                                <input asp-for="Email" class="form-control" id="email" aria-describedby="emailHelp">
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Password" for="exampleInputEmail1"></label>
+                                <input asp-for="Password" type="password" id="password" class="form-control" aria-describedby="emailHelp">
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ConfirmPassword" for="exampleInputEmail1"></label>
+                                <input asp-for="ConfirmPassword" type="password" id="confirm" class="form-control" aria-describedby="emailHelp">
+                            </div>
+                            <div class="col-md-12 text-center ">
+                                <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Register</button>
+                            </div>
+                            <div class="form-group">
+                                <p style="margin-top: 30px;" class="text-center"><a href="Login" id="signup">Back to login</a></p>
+                            </div>
+                        </form>
 
-<h1>Register</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="row">
+@*<div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <form method="post" enctype="multipart/form-data">
@@ -38,4 +83,4 @@
         </form>
 
     </div>
-</div>
+</div>*@

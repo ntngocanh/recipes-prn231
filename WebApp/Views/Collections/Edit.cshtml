@@ -1,0 +1,80 @@
+﻿@model BusinessObjects.DTO.CollectionDTO
+@{
+    ViewData["Title"] = "Edit";
+}
+<link rel="stylesheet" href="~/css/editRecipe.css" />
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    @if ((int)ViewData["userId"] != @Model.UserId)
+    {
+        <div class="col-md-8" id="notAllowed">
+            <p>Bạn không có quyền chỉnh sửa bộ sưu tầm này.</p>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-8" id="editForm">
+            <form>
+                <div class="section">
+                    <div class="text-danger"></div>
+                    <div class="form-group">
+                        <label for="Name">Tên collection</label>
+                        <input class="form-control" id="nameBox" value="@Model.Name"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Description">Thông tin mô tả</label>
+                        <textarea id="descriptionBox" class="form-control">@Model.Description</textarea>
+                    </div>
+                </div>
+            
+                <div class="form-group">
+                    <button id="collectionCreate" class="btn btn-primary">Lưu chỉnh sửa</button>
+                </div>
+            </form>
+        </div> 
+    }
+    
+    <div>
+        <a id="back" href="">Back to List</a>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $("#collectionCreate").click(function(e) {
+            data = new FormData();
+            data.append("CollectionId", @Model.CollectionId);
+            data.append("Name", $("#nameBox").val());
+            data.append("Description", $("#descriptionBox").val());
+            data.append("UserId", @ViewData["userId"]);
+            var object = {};
+            data.forEach((value, key) => object[key] = value);
+            console.log(JSON.stringify(object))
+            $.ajax({
+                url: "https://localhost:5001/api/Collections/" + @Model.CollectionId,
+                type: "put",
+                data: JSON.stringify(object),
+                processData: false,
+                contentType: "application/json",
+                success: function(result, status, xhr) {
+                    console.log(status)
+                    //$("#back")[0].click();
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        });
+    });
+</script>

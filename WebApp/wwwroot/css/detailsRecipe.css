@@ -150,3 +150,28 @@ input {
 .reply-box{
     margin: 0 60px;
 }
+
+.reaction-toggle{
+    text-decoration: none;
+    color: dimgrey;
+    margin-left: 20px;
+    font-size: 12px
+}
+
+.reaction-toggle :hover{
+    text-decoration: none;
+    color: darkgrey;
+}
+
+#react-list-modal .modal-content{
+    min-height: 500px;
+}
+
+#react-list-modal li{
+    padding: 0 10px;
+    margin: 0px 5px;
+}
+
+#react-list-modal li .active {
+    border-bottom: 1px solid orangered;
+}

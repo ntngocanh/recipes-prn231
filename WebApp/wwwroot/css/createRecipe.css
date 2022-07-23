@@ -65,5 +65,8 @@ input {
     cursor: pointer;
     margin-left: 10px;
 }
+.deleteRecipe{
+    font-weight:bolder;
+}
 
 

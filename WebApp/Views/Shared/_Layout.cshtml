@@ -14,40 +14,43 @@
     <div>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Navbar</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index"><img src="~/images/logo.png" id="logo-img" /></a>
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                            <a class="nav-link active" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (@HttpContextAccessor.HttpContext.Session.GetString("user") == null)
-                        {
 
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Logout">Logout</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                        </li>
                     </ul>
-                    <form class="d-flex" style="float: right;">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
+                    <div class="nav-item"></div>
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+
                 </div>
+                @if (@HttpContextAccessor.HttpContext.Session.GetString("user") != null)
+                {
+                    <div class="d-flex right-item">
+                        <img src="~/images/plus-icon.png" />
+                        <span>Viết món mới</span>
+                    </div>
+                    <div class="d-flex right-item">
+                        <img src="~/images/avatar.jpg" />
+                        <span>Bếp cá nhân</span>
+                    </div>
+                    <div class="d-flex right-item">
+                        <img src="~/images/logout.jpg" />
+                        <span id="logout-btn">Đăng xuất</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex right-item">
+                        <a class="nav-link" asp-controller="Auth" asp-action="Login">Đăng nhập</a>
+                    </div>
+                    <div class="d-flex right-item">
+                        <a class="nav-link" asp-controller="Auth" asp-action="Register">Đăng ký</a>
+                    </div>
+                }
             </div>
         </nav>
     </div>
@@ -62,6 +65,13 @@
             &copy; 2022 - WebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    <script>
+        $("#logout-btn").on("click", function () {
+            if (confirm("Bạn chắc chắn muốn đăng xuất?")){
+                window.location.href = "/Auth/Logout";
+            };
+        });
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

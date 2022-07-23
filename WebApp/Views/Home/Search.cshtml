@@ -1,0 +1,109 @@
+﻿@model List<BusinessObjects.DTO.RecipeDTO>
+
+
+@{
+    ViewData["Title"] = "Search";
+}
+<div id="searchQuery" style="display:none">@ViewBag.SearchString</div>
+<div class="sidenav">
+    <h6 class="center">Lọc kết quả</h6>
+    <div>
+        <div>Từ ngày</div>
+        <input type="date" placeholder="dd-mm-yyyy" id="dt1" value="@ViewBag.FromDate">
+    </div>
+    <div>
+        <div>Đến ngày</div>
+        <input type="date" placeholder="dd-mm-yyyy" id="dt2" value="@ViewBag.ToDate">
+    </div>
+    <button class="btn" id="filter-btn">Lọc</button>
+</div>
+<div class="main">
+    <div id="searchResult" class="parent">
+    @foreach (var item in Model)
+    {
+        <div class="child">
+            <img src="../Images/@item.User.Avatar" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=@item.User.UserId"> @item.User.Name</a>
+            <div class="card" style="width: 15rem;">
+                <div class="card-body">
+                    <img src="../Images/@item.Image" class=" img-circle thumbnail" alt="...">
+                    <h5 class="card-title">@item.Name</h5>
+                    <p class="card-text">@item.Description</p>
+                    <a href="../Recipes/Details/@item.RecipeId" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+</div>
+
+<script>
+    
+    var pageNumber = 2;
+    $(window).scroll(function () {
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            console.log("scroll");
+            var fromDate = $("#dt1").val();
+            var toDate = $("#dt2").val();
+            $.ajax({
+                url: "https://localhost:5001/api/Recipes/search?SearchString=" + $("#searchQuery").text() + "&PageNumber=" + pageNumber + "&PageSize=15&MinDate=" + fromDate + "&MaxDate=" + toDate,
+                method: 'get',
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    if (result.length == 0) {
+                        console.log("empty");
+                    }
+                    $.each(result, function (index, value) {
+                        var htmlContent = `<img src="../Images/` + value["user"]["avatar"] +`" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=` + value["user"]["userId"] +`"> ` + value["user"]["name"] +`</a>
+                                                <div class="card" style="width: 15rem;">
+                                                    <div class="card-body">
+                                                        <img src="../Images/` + value["image"] +`" class=" img-circle thumbnail" alt="...">
+                                                        <h5 class="card-title">` + value["name"]+`</h5>
+                                                        <p class="card-text">` + value["description"] +`</p>
+                                                        <a href="../Recipes/Details/` + value["recipeId"] +`" class="btn btn-primary">View Details</a>
+                                                    </div>
+                                            </div>`;
+                        $("<div>").attr("class", "child").html(htmlContent).appendTo($("#searchResult"));
+                    });
+                    pageNumber++;
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        }
+    });
+
+    $("#filter-btn").on("click", function () {
+        var fromDate = $("#dt1").val();
+        var toDate = $("#dt2").val();
+        $.ajax({
+            url: "https://localhost:5001/api/Recipes/search?SearchString=" + $("#searchQuery").text() + "&PageNumber=" + 1 + "&PageSize=15&MinDate=" + fromDate + "&MaxDate=" + toDate,
+            method: 'get',
+            contentType: "application/json",
+            success: function (result, status, xhr) {
+                pageNumber = 1;
+                $("#searchResult").html("");
+                if (result.length == 0) {
+                    console.log("empty");
+                }
+                $.each(result, function (index, value) {
+                    var htmlContent = `<img src="../Images/` + value["user"]["avatar"] + `" class="avatar img-circle rounded-circle" alt="...">&nbsp;&nbsp;&nbsp;<a href="../User/Details?Id=` + value["user"]["userId"] + `"> ` + value["user"]["name"] + `</a>
+                                                <div class="card" style="width: 15rem;">
+                                                    <div class="card-body">
+                                                        <img src="../Images/` + value["image"] + `" class=" img-circle thumbnail" alt="...">
+                                                        <h5 class="card-title">` + value["name"] + `</h5>
+                                                        <p class="card-text">` + value["description"] + `</p>
+                                                        <a href="../Recipes/Details/` + value["recipeId"] + `" class="btn btn-primary">View Details</a>
+                                                    </div>
+                                            </div>`;
+                    $("<div>").attr("class", "child").html(htmlContent).appendTo($("#searchResult"));
+                });
+                pageNumber++;
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    });
+</script>

@@ -13,6 +13,8 @@ using BusinessObjects.DTO;
 using Microsoft.AspNetCore.JsonPatch;
 using AutoMapper.QueryableExtensions;
 using System.Security.Claims;
+using API.Utils;
+using System.Text.Json;
 
 namespace API.Controllers
 {
@@ -256,5 +258,31 @@ namespace API.Controllers
                 yield return day;
         }
 
+        [HttpGet("search")]
+        public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)
+        {
+            if (!parameters.ValidYearRange)
+            {
+                return BadRequest("Max date cannot be less than min date");
+            }
+            var configuration = new MapperConfiguration(cf => cf.AddProfile(new RecipeProfile()));
+
+            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions);
+            IQueryable<RecipeDTO> recipeDTOQueryable = recipesList.ProjectTo<RecipeDTO>(configuration);
+            var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOQueryable, parameters.PageNumber, parameters.PageSize);
+            var metadata = new
+            {
+                recipes.TotalCount,
+                recipes.PageSize,
+                recipes.CurrentPage,
+                recipes.TotalPages,
+                recipes.HasNext,
+                recipes.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+            return Ok(recipes);
+        }
+
+        
     }
 }

@@ -68,9 +68,8 @@ namespace WebApp.Controllers
             {
                 return RedirectToAction("Error", "Home");
             }
-            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/drafts/" + user.UserId);
+            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/drafts");
             if (response.IsSuccessStatusCode)
             {
                 string data = await response.Content.ReadAsStringAsync();
@@ -121,6 +120,17 @@ namespace WebApp.Controllers
         }
         public async Task<IActionResult> Edit(int id)
         {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions
@@ -128,7 +138,11 @@ namespace WebApp.Controllers
                 PropertyNameCaseInsensitive = true
             };
             RecipeDTO recipe = JsonSerializer.Deserialize<RecipeDTO>(strData, options);
-            return View(recipe);
+            if(recipe != null)
+            {
+                return View(recipe);
+            }
+            return RedirectToAction("Error", "Home");
         }
         [HttpPost]
         public async Task<JsonResult> UploadImage([FromServices] IHostingEnvironment hostingEnvironment)
@@ -138,7 +152,7 @@ namespace WebApp.Controllers
             {
                 var image = Request.Form.Files[0];
 
-                string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images");
+                string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images/fromUsers");
 
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
 

@@ -12,6 +12,7 @@ using BusinessObjects.Models;
 using BusinessObjects.DTO;
 using Microsoft.AspNetCore.JsonPatch;
 using AutoMapper.QueryableExtensions;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -36,6 +37,72 @@ namespace API.Controllers
             return await _context.Recipes.ToListAsync();
         }
 
+        [HttpGet("HomePage")]
+        public ActionResult<IEnumerable<Recipe>> GetRecipesHomePage()
+        {
+            var list=  _context.Recipes.OrderByDescending(x=>x.DateCreated).Include(x=>x.User).ToList();
+           
+            if (list.Count <=4 ) {
+                return list;
+            }
+            List<Recipe> smallList = new List<Recipe>();
+            for (int i = 0; i < 4; i++) {
+                smallList.Add(list[i]);
+                
+            }
+            return smallList;
+        }
+
+        [HttpGet("HomePage/Premium")]
+        public ActionResult<IEnumerable<Recipe>> GetRecipesPremium()
+        {
+            var list = _context.Recipes.OrderByDescending(x => x.DateCreated).Include(x => x.User).Where(x=>x.User.RoleId==3).ToList();
+
+            if (list.Count <= 4)
+            {
+                return list;
+            }
+            List<Recipe> smallList = new List<Recipe>();
+            for (int i = 0; i < 4; i++)
+            {
+                smallList.Add(list[i]);
+
+            }
+            return smallList;
+        }
+        [HttpGet("Statistic")]
+
+        public ActionResult GetRecipesByPast7Day()
+        {
+           
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            for (int i = 6; i >= 0; i--) {
+                var num = _context.Recipes.Where(x => EF.Functions.DateDiffDay(x.DateCreated,DateTime.Now) == i).AsEnumerable().ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(DateTime.Now.AddDays(-i).ToString("yyyy-MM-dd")),number));
+            }
+            return Ok(list);
+          
+        }
+        [HttpGet("Statistic/{startDate}/{endDate}")]
+
+        public ActionResult GetRecipesByDays(DateTime startDate,DateTime endDate)
+        {
+            DateTime date = startDate;
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            foreach (DateTime day in EachDay(startDate, endDate)) {
+                var num = _context.Recipes.Where(x => x.DateCreated == day).ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(day.ToString("yyyy-MM-dd")), number));
+            }
+              
+            return Ok(list);
+
+        }
         // GET: api/Recipes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)
@@ -54,36 +121,6 @@ namespace API.Controllers
             return recipeDTO;
         }
 
-        // PUT: api/Recipes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRecipe(int id, Recipe recipe)
-        {
-            if (id != recipe.RecipeId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(recipe).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RecipeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -91,6 +128,15 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Recipe>> PostRecipe(Recipe recipe)
         {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            if(recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
 
@@ -123,21 +169,46 @@ namespace API.Controllers
 
             return NoContent();
         }
-
+        [HttpGet("HomePage/Trend")]
+        public IActionResult GetTrend() {
+           var user= _context.Recipes
+                         .GroupBy(a => a.UserId)
+                         .Select(g => new { g.Key, Count = g.Count() ,User = _context.Users.FirstOrDefault(x=>x.UserId==g.Key)}).ToList();
+            if (user.Count <= 4)
+                return Ok(user);
+            else {
+                var small = user.ToList();
+                small.Clear();
+                for (int i = 0; i < 4; i++) {
+                    small.Add(user[i]);
+                }
+                return Ok(small);
+            }
+        }
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
+        [Authorize]
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Recipe> patchEntity)
         {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+
             var entity = _context.Recipes.FirstOrDefault(r => r.RecipeId == id);
 
             if (entity == null)
             {
                 return NotFound();
             }
-
+            if(entity.UserId != userId)
+            {
+                return Unauthorized();
+            }
             patchEntity.ApplyTo(entity);
             _context.SaveChanges();
 
@@ -145,10 +216,44 @@ namespace API.Controllers
         }
 
         // GET: api/Recipes
-        [HttpGet("drafts/{id}")]
-        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetDraftRecipes(int id)
+        [Authorize]
+        [HttpGet("drafts")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetDraftRecipes()
         {
-            return await _context.Recipes.Where(r => r.UserId == id && r.RecipeStatus == RecipeStatus.Draft).ProjectTo<RecipeDTO>(config).ToListAsync();
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            return await _context.Recipes.Where(r => r.UserId == uId && r.RecipeStatus == RecipeStatus.Draft).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
+        [Authorize]
+        [HttpGet("edit/{recipeId}")]
+        public async Task<ActionResult<RecipeDTO>> GetRecipeToEdit(int recipeId)
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            var recipe = await _context.Recipes
+                .Include(r => r.User)
+                .Include(r => r.Ingredients)
+                .Include(r => r.Steps)
+                .FirstOrDefaultAsync(r => r.RecipeId == recipeId && r.UserId == uId);
+
+            if (recipe == null)
+            {
+                return NotFound();
+            }
+            RecipeDTO recipeDTO = mapper.Map<Recipe, RecipeDTO>(recipe);
+            return recipeDTO;
+        }
+
+        private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+        {
+            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+                yield return day;
         }
 
     }

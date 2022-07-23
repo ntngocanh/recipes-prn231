@@ -106,6 +106,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> PostComment(CommentRequest comment)
         {
             /*try
@@ -130,6 +131,7 @@ namespace API.Controllers
 
         }
         [HttpPost("reportComment/{commentId}")]
+
         public async Task<IActionResult> ReportComment(Report report)
         {
             _context.Reports.Add(report);
@@ -142,6 +144,7 @@ namespace API.Controllers
 
         }
         [HttpPut("{commentId}")]
+        [Authorize]
         public IActionResult EditComment(CommentRequest comment, int commentId)
         {
             try
@@ -162,6 +165,8 @@ namespace API.Controllers
         }
         [Authorize(Roles = "Admin")]
         [HttpDelete("{commentId}")]
+        [Authorize]
+
         public IActionResult DeleteComment(int commentId)
         {
             try

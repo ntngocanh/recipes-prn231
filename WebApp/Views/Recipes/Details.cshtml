@@ -100,9 +100,6 @@
         <div class="section">
             <div class="tableTitle"><i style="margin-right:10px" class="fa-regular fa-message"></i>Bình luận</div>
             <div class="row flex-row align-items-center" id="comment-box">
-                <div class="avatar avatar-sm rounded-circle">
-                    <img class="avatar-img" src="/images/dry-ingredients.jpg" alt="">
-                </div>
                 <div class="col-md-10">
                     <textarea rows="1" id="comment-input" class="comment-input textarea form-rounded" role="textbox" contenteditable></textarea>
                 </div>
@@ -251,9 +248,7 @@
             $.ajax({
                 url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
                 type: "delete",
-            headers: {
-                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
-            },
+            
                 contentType: "application/json",
                 success: function (result, status, xhr) {
                     window.location.href = "/Home/Index";
@@ -309,6 +304,9 @@
                         url: "https://localhost:5001/api/Reactions",
                         method: 'post',
                         contentType: "application/json",
+                        headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                         data: JSON.stringify(postJson),
                         success: function (result, status, xhr) {
                             switch (postJson.reactionType) {
@@ -343,6 +341,9 @@
                     $.ajax({
                         url: "https://localhost:5001/api/Reactions",
                         method: 'put',
+                        headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                         contentType: "application/json",
                         data: JSON.stringify(json),
                         success: function (result, status, xhr) {
@@ -380,6 +381,9 @@
                         method: 'delete',
                         contentType: "application/json",
                         data: JSON.stringify(json),
+                        headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                         success: function (result, status, xhr) {
                             switch (json.reactionType) {
                                 case 0:
@@ -429,6 +433,9 @@
                 $.ajax({
                     url: "https://localhost:5001/api/Comments/" + $(this).attr("id").replace("del-comment-", ""),
                     method: 'delete',
+                    headers: {
+                        "Authorization": "Bearer @ViewData["token"]"
+                    },
                     contentType: "application/json",
                     success: function (result, status, xhr) {
                         $(comment).hide();
@@ -516,19 +523,23 @@
         });
 
         $(".comment-post-btn").on("click", function () {
-            var textvalue = $(this).parent().find("div:nth-child(2)").find(":first-child").val();
+            var textvalue = $("#comment-input").val();
             if (textvalue) {
                 var json = {
                     userId: '@ViewData["userId"]',
                     recipeId: $("#recipe-id").text(),
                     parentCommentId: null,
-                    text: $(this).parent().find("div:nth-child(2)").find(":first-child").val(),
+                    text: textvalue,
                     commentStatus: 0
                 };
+                console.log(json);
                 var htmlContent = "";
                 $.ajax({
                     url: "https://localhost:5001/api/Comments",
                     type: "post",
+                    headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify(json),
                     success: function (result, status, xhr) {
@@ -604,6 +615,9 @@
                 url: "https://localhost:5001/api/Comments/" + id,
                 method: "put",
                 contentType: "application/json; charset=utf-8",
+                headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                 data: JSON.stringify(json),
                 success: function (result, status, xhr) {
                     commentBox.html(textContent);
@@ -660,6 +674,9 @@
                 url: "https://localhost:5001/api/Comments",
                 type: "post",
                 contentType: "application/json; charset=utf-8",
+                headers: {
+                            "Authorization": "Bearer @ViewData["token"]"
+                        },
                 data: JSON.stringify(json),
                 success: function (result, status, xhr) {
                     htmlContent += `<div class="row">

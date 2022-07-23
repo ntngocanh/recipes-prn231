@@ -61,10 +61,21 @@ namespace WebApp.Controllers
         //}
         public IActionResult Create()
         {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
             if (user != null)
             {
                 ViewData["userId"] = user.UserId;
+                ViewBag.userId = user.UserId;
             }
             else
                 ViewData["userId"] = 0;
@@ -72,6 +83,16 @@ namespace WebApp.Controllers
         }
         public async Task<IActionResult> Edit(int id)
         {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
             if (user != null)
             {

@@ -1,4 +1,6 @@
-﻿@model BusinessObjects.DTO.CollectionDTO
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model BusinessObjects.DTO.CollectionDTO
 @{
     ViewData["Title"] = "Edit";
 }
@@ -61,6 +63,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Collections/" + @Model.CollectionId,
                 type: "put",
+                headers: {
+                    "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+                },
                 data: JSON.stringify(object),
                 processData: false,
                 contentType: "application/json",

@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
     ViewData["Title"] = "Create";
 }
 <link rel="stylesheet" href="~/css/editRecipe.css" />
@@ -26,10 +28,10 @@
             
             <div class="form-group">
                 <button id="collectionCreate" class="btn btn-primary">Tạo mới</button>
-                <a id="back" href="../MyCollections" style="display:none"></a>
+                <a id="back" href="../MyCollections/@ViewBag.userId" style="display:none"></a>
             </div>
             <div>
-                <a id="back" href="../MyCollections">Back to List</a>
+                <a id="back" href="../MyCollection/@ViewBag.userId">Back to List</a>
                 <a id="login" href="../Auth/Login" style="display:none"></a>
             </div>
         </form>
@@ -58,6 +60,9 @@
             $.ajax({
                 url: "https://localhost:5001/api/Collections",
                 type: "post",
+                headers: {
+                    "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+                },
                 data: JSON.stringify(object),
                 processData: false,
                 contentType: "application/json",

@@ -38,6 +38,9 @@ function fillReactList() {
         method: 'get',
         contentType: "application/json",
         success: function (result, status, xhr) {
+            $("#heart-list").empty();
+            $("#yummy-list").empty();
+            $("#clap-list").empty();
             $.each(result, function (index, value) {
                 var htmlContent = `<div class="row flex-row">
                                 <div class="avatar avatar-sm rounded-circle">

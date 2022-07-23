@@ -1,5 +1,6 @@
 ﻿
 @using Microsoft.AspNetCore.Http;
+@using BusinessObjects.DTO;
 @inject IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +30,22 @@
                 </div>
                 @if (@HttpContextAccessor.HttpContext.Session.GetString("user") != null)
                 {
+                    @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Premium")
+                    {
+                        @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RequestToVIP != true)
+                        {
+                            <button id="upgrade" class="btn btn-warning">Nâng cấp lên premium</button>
+                        }
+                        else
+                        {
+                            <button disabled class="btn btn-warning">Đã yêu cầu Premium</button>
+                        }
+                    }
+                    else
+                    {
+                        <button disabled class="btn btn-warning">
+                            Premium!</button>
+                    }
                     <div class="d-flex right-item" id="create-btn">
                         <img src="~/images/plus-icon.png" />
                         <span>Viết món mới</span>
@@ -41,6 +58,8 @@
                         <img src="~/images/logout.jpg" />
                         <span id="logout-btn">Đăng xuất</span>
                     </div>
+
+
                 }
                 else
                 {
@@ -69,6 +88,24 @@
         $("#logout-btn").on("click", function () {
             if (confirm("Bạn chắc chắn muốn đăng xuất?")){
                 window.location.href = "/Auth/Logout";
+            };
+        });
+        $("#upgrade").on("click", function () {
+            if (confirm("Bạn chắc chắn muốn nâng cấp lên Premium?")) {
+                $.ajax({
+                    type: "PUT",
+                    url: '/User/RequestVIP',
+                    contentType: false,
+                    processData: false,
+                   
+                    success: function (result) {
+                        alert(result);
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        alert('Something is going to wrong please try agan!');
+                    }
+                });
+                
             };
         });
         $("#create-btn").on("click", function () {

@@ -107,6 +107,24 @@ namespace API.Controllers
             _context.SaveChanges();
             return Ok("Upgrade Successfully!");
         }
+
+        [HttpPut]
+        [Route("RequestVIP/{Id}")]
+        public ActionResult Request(int Id)
+        {
+            var u = _context.Users.FirstOrDefault(x => x.UserId == Id);
+            if (u == null)
+            {
+                return NotFound();
+            }
+            if (u.RoleId == 3)
+            {
+                return AcceptedAtAction("User is already premium!");
+            }
+            u.RequestToVIP = true;
+            _context.SaveChanges();
+            return Ok("Request Successfully!");
+        }
         [HttpPut]
         [Route("EditProfile/{Id}")]
         public ActionResult EditProfile(int Id,User user)

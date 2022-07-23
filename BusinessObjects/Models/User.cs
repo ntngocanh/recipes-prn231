@@ -18,6 +18,7 @@ namespace BusinessObjects.Models
         public string Avatar { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }
+        public bool RequestToVIP { get; set; }
         [JsonIgnore]
         public virtual ICollection<Recipe> Recipes { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }

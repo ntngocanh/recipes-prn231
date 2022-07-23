@@ -33,20 +33,34 @@
                 {
                     @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Premium")
                     {
-                        @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RequestToVIP != true)
+                        @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Admin")
                         {
-                            <button id="upgrade" class="btn btn-warning">Nâng cấp lên premium</button>
+                            @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RequestToVIP != true)
+                            {
+                                <button id="upgrade" class="btn btn-warning">Nâng cấp lên premium</button>
+                            }
+                            else
+                            {
+                                <button disabled class="btn btn-warning">Đã yêu cầu Premium</button>
+                            }
                         }
                         else
                         {
-                            <button disabled class="btn btn-warning">Đã yêu cầu Premium</button>
+                            <a href="../../Dashboard" class="btn btn-primary">
+                                Dashboard
+                            </a>
                         }
+
+
                     }
                     else
                     {
-                        <button disabled class="btn btn-warning">
-                            Premium!</button>
-                    }
+                            <button disabled class="btn btn-warning">
+                                Premium!
+                            </button>
+                        
+
+                }
                     <div class="d-flex right-item" id="create-btn">
                         <img src="~/images/plus-icon.png" />
                         <span>Viết món mới</span>

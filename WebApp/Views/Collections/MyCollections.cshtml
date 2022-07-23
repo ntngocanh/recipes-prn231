@@ -13,7 +13,7 @@
     <div id="newest" class="row">
     </div>
     <div style="align-content: center; display: flex">
-        <button class="btn btn-primary" style="margin:auto" id="newColl">Hiển thị thêm</button>
+        @*<button class="btn btn-primary" style="margin:auto" id="newColl">Hiển thị thêm</button>*@
         <p style="margin:auto" id="endWarning">Bạn đã đến cuối trang</p>
     </div>
 </div>
@@ -26,11 +26,11 @@
         showCollections();
         $.noConflict();
 
-        //window.onscroll = function(ev) {
-        //    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        //        showCollections();
-        //    }
-        //};
+        window.onscroll = function(ev) {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                showCollections();
+            }
+        };
 
 
 
@@ -40,10 +40,9 @@
         //   }
         //});
 
-        $("#newColl").click(function(e) {
-            showCollections();
-        });
-
+        //$("#newColl").click(function(e) {
+        //    showCollections();
+        //});
         function showCollections() {
             count = count + 1;
             $.ajax({
@@ -54,7 +53,7 @@
                 success: function(result, status, xhr) {
                     if (!$.trim(result)){
                         $("#endWarning").show();
-                        $("#newColl").hide();
+                        //$("#newColl").hide();
                     }
                     $.each(result, function(index, value) {
 

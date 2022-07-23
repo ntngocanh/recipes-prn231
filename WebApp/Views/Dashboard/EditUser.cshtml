@@ -1,0 +1,263 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="container bootstrap snippet">
+    <div class="row">
+        <div class="col-sm-10"><h1>User name</h1></div>
+        <div class="col-sm-2"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <!--left col-->
+
+
+            <div class="text-center">
+                <img  id="avaimg"src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
+                <div class="form-group">
+
+                    <div class="col-xs-6">
+                       <form id="imgform">
+                        <input formenctype="multipart/form-data" onchange="previewFile()" type="file" class="form-control" name="img" id="img" title="enter your first name if any.">
+                           </form>
+                    </div>
+                </div>
+            </div><br>
+
+
+
+
+
+
+
+        </div><!--/col-3-->
+        <div class="col-sm-9">
+
+
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="home">
+                    <hr>
+                    <form class="form" id="Info">
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="first_name"><h4>ID</h4></label>
+                                <input type="text" class="form-control" name="first_name" id="userId" title="enter your first name if any.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="last_name"><h4>Name</h4></label>
+                                <input type="text" class="form-control" name="last_name" id="name" placeholder="last name" title="enter your last name if any.">
+                            </div>
+                        </div>
+                        <div style="display:none;" class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="last_name"><h4>Avatar</h4></label>
+                                <input type="text" class="form-control"  id="avatar" placeholder="last name" title="enter your last name if any.">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="email"><h4>Email</h4></label>
+                                <input type="email" readonly class="form-control" name="email" id="email" placeholder="you@email.com" title="enter your email.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="email"><h4>Role</h4></label>
+                                <select id="role"></select>
+                            </div>
+                        </div>
+
+
+                    </form>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <br>
+                            <button class="btn btn-lg btn-success" style="display:none;" id="SaveBtn" type="submit"><i class="glyphicon glyphicon-ok-sign"></i> Save</button>
+                            <button class="btn btn-lg btn-success" id="EditBtn"><i class="glyphicon glyphicon-ok-sign"></i> Edit</button>
+                        </div>
+                    </div>
+
+
+                </div><!--/tab-pane-->
+
+
+            </div><!--/tab-content-->
+
+        </div><!--/col-9-->
+    </div><!--/row-->
+</div><!--/row-->
+<script>
+    function previewFile() {
+        var preview = document.querySelector('img');
+        var file = document.querySelector('input[type=file]').files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+</script>
+<script>
+
+    $(document).ready(function () {
+        ViewMode();
+        GetRole();
+        GetUser();
+
+
+
+        function ViewMode() {
+            $("#Info :input").attr("disabled", true);
+            $("#EditBtn").attr("disabled", false);
+            $("#SaveBtn").hide();
+            $("#img").hide();
+
+        }
+        function EditMode() {
+            $("#img").show();
+            $("#SaveBtn").show();
+            $("#EditBtn").hide();
+            $("#Info :input").attr("disabled", false);
+            $("#userId").attr("disabled", true);
+        }
+
+        $("#EditBtn").click(function () {
+            EditMode();
+        });
+
+        $("#SaveBtn").click(function () {
+            var files = document.getElementById('img').files;// $('#file').files[0];// e.target.files;
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                        //data.append(base64String, base64String);
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: '/Dashboard/UploadFile',
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (result) {
+                          
+                            $("#avatar").val(result);
+                            alert($("#avatar").val());
+                            let params = (new URL(document.location)).searchParams;
+                            let id = params.get("Id");
+
+                            data = new FormData();
+                            data.append("name", $("#name").val());
+                            data.append("avatar", $("#avatar").val());
+                            data.append("roleId", $("#role").val());
+
+                            var object = {};
+                            data.forEach((value, key) => object[key] = value);
+                            console.log(JSON.stringify(object))
+                            $.ajax({
+                                url: "https://localhost:5001/api/Users/EditProfile/" + id,
+                                type: "put",
+                                data: JSON.stringify(object),
+                                processData: false,
+                                contentType: 'application/json',
+                                success: function (result, status, xhr) {
+                                    GetUser();
+                                    console.log(status)
+                                },
+                                error: function (xhr, status, error) {
+                                    console.log(xhr);
+                                }
+                            });
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            alert('Something is going to wrong please try agan!');
+                        }
+                    });
+                } else {
+                    alert("Upgrade your browser!");
+                }
+            }
+            
+        
+
+        });
+
+        function GetRole() {
+            let params = (new URL(document.location)).searchParams;
+            let id = params.get("Id");
+            $.ajax({
+                url: "https://localhost:5001/api/Roles",
+                type: "get",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    $.each(result, function (index, item) {
+
+                        appendElement = $("select").last();
+                        appendElement.append($("<option>", {
+                            value: item.roleId,
+                            text: item.roleName,
+
+                        }));
+
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        }
+        function GetUser() {
+            ViewMode();
+            let params = (new URL(document.location)).searchParams;
+            let id = params.get("Id");
+            $.ajax({
+                url: "https://localhost:5001/api/Users/" + id,
+                type: "get",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    
+
+                        $("#userId").val(result["userId"]);
+                        $("#name").val(result["name"]);
+                        $("#email").val(result["email"]);
+                        $('#role').val(result["role"]["roleId"]).change();
+                        
+                        if (result["avatar"] != null) {
+
+                          
+                            let r = "../images/" + result["avatar"];
+                            
+                            $("#avaimg").attr("src", r);
+                        }
+
+                   
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        }
+
+    });
+
+</script>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessObjects.Models
@@ -17,6 +18,7 @@ namespace BusinessObjects.Models
         public string Avatar { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Recipe> Recipes { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
     }

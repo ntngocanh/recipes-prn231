@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessObjects.Models
@@ -19,7 +20,9 @@ namespace BusinessObjects.Models
         public virtual User User { get; set; }
         public virtual Recipe Recipe { get; set; }
         public string Text { get; set; }
+        
         public CommentStatus CommentStatus { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Report> Reports { get; set; }
     }
 }

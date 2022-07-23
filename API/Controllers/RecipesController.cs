@@ -11,6 +11,7 @@ using API.DTO;
 using BusinessObjects.Models;
 using BusinessObjects.DTO;
 using Microsoft.AspNetCore.JsonPatch;
+using AutoMapper.QueryableExtensions;
 
 namespace API.Controllers
 {
@@ -86,6 +87,7 @@ namespace API.Controllers
 
         // POST: api/Recipes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Recipe>> PostRecipe(Recipe recipe)
         {
@@ -140,6 +142,13 @@ namespace API.Controllers
             _context.SaveChanges();
 
             return Ok(entity);
+        }
+
+        // GET: api/Recipes
+        [HttpGet("drafts/{id}")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetDraftRecipes(int id)
+        {
+            return await _context.Recipes.Where(r => r.UserId == id && r.RecipeStatus == RecipeStatus.Draft).ProjectTo<RecipeDTO>(config).ToListAsync();
         }
 
     }

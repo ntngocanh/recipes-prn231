@@ -37,6 +37,72 @@ namespace API.Controllers
             return await _context.Recipes.ToListAsync();
         }
 
+        [HttpGet("HomePage")]
+        public ActionResult<IEnumerable<Recipe>> GetRecipesHomePage()
+        {
+            var list=  _context.Recipes.OrderByDescending(x=>x.DateCreated).Include(x=>x.User).ToList();
+           
+            if (list.Count <=4 ) {
+                return list;
+            }
+            List<Recipe> smallList = new List<Recipe>();
+            for (int i = 0; i < 4; i++) {
+                smallList.Add(list[i]);
+                
+            }
+            return smallList;
+        }
+
+        [HttpGet("HomePage/Premium")]
+        public ActionResult<IEnumerable<Recipe>> GetRecipesPremium()
+        {
+            var list = _context.Recipes.OrderByDescending(x => x.DateCreated).Include(x => x.User).Where(x=>x.User.RoleId==3).ToList();
+
+            if (list.Count <= 4)
+            {
+                return list;
+            }
+            List<Recipe> smallList = new List<Recipe>();
+            for (int i = 0; i < 4; i++)
+            {
+                smallList.Add(list[i]);
+
+            }
+            return smallList;
+        }
+        [HttpGet("Statistic")]
+
+        public ActionResult GetRecipesByPast7Day()
+        {
+           
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            for (int i = 6; i >= 0; i--) {
+                var num = _context.Recipes.Where(x => EF.Functions.DateDiffDay(x.DateCreated,DateTime.Now) == i).AsEnumerable().ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(DateTime.Now.AddDays(-i).ToString("yyyy-MM-dd")),number));
+            }
+            return Ok(list);
+          
+        }
+        [HttpGet("Statistic/{startDate}/{endDate}")]
+
+        public ActionResult GetRecipesByDays(DateTime startDate,DateTime endDate)
+        {
+            DateTime date = startDate;
+            List<NumberOfRecipePerDay> list = new List<NumberOfRecipePerDay>();
+            foreach (DateTime day in EachDay(startDate, endDate)) {
+                var num = _context.Recipes.Where(x => x.DateCreated == day).ToList();
+                int number;
+                if (num == null) number = 0;
+                else number = num.Count;
+                list.Add(new NumberOfRecipePerDay(Convert.ToDateTime(day.ToString("yyyy-MM-dd")), number));
+            }
+              
+            return Ok(list);
+
+        }
         // GET: api/Recipes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDTO>> GetRecipe(int id)
@@ -103,7 +169,22 @@ namespace API.Controllers
 
             return NoContent();
         }
-
+        [HttpGet("HomePage/Trend")]
+        public IActionResult GetTrend() {
+           var user= _context.Recipes
+                         .GroupBy(a => a.UserId)
+                         .Select(g => new { g.Key, Count = g.Count() ,User = _context.Users.FirstOrDefault(x=>x.UserId==g.Key)}).ToList();
+            if (user.Count <= 4)
+                return Ok(user);
+            else {
+                var small = user.ToList();
+                small.Clear();
+                for (int i = 0; i < 4; i++) {
+                    small.Add(user[i]);
+                }
+                return Ok(small);
+            }
+        }
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
@@ -167,6 +248,12 @@ namespace API.Controllers
             }
             RecipeDTO recipeDTO = mapper.Map<Recipe, RecipeDTO>(recipe);
             return recipeDTO;
+        }
+
+        private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+        {
+            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+                yield return day;
         }
 
     }

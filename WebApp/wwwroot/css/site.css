@@ -85,3 +85,39 @@ body {
         max-height: 30px;
         border-radius: 50%;
     }
+
+/*@media (min-width: 1200px) {
+    .container {
+        max-width: 100%;
+    }
+}*/
+
+.avatar {
+    width:30px;
+    height:30px;
+    border-radius:100%;
+}
+.thumbnail {
+    
+    width:100%;
+    max-height:198px;
+}
+.newestdish {
+    position: relative;
+   
+    font-weight: 700;
+    font-size: 36px;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+.SeeMore {
+    font-weight: 300;
+    font-size: 25px;
+    
+    font-style: italic;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    text-decoration:underline;
+}

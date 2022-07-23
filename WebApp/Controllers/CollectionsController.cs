@@ -59,39 +59,24 @@ namespace WebApp.Controllers
         //{
         //    return View();
         //}
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            Collection collection = new Collection()
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null)
             {
-                UserId = SessionExtension.Get<UserDTO>(HttpContext.Session, "user").UserId
-            };
-            string token = "";
-            if (HttpContext.Session.Get("token") != null)
-            {
-                token = HttpContext.Session.GetString("token");
-            }
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var json = JsonSerializer.Serialize(collection);
-            var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(RecipesApiUrl, data);
+                ViewData["userId"] = user.UserId;
 
-            var result = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-            {
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                Collection c = JsonSerializer.Deserialize<Collection>(result, options);
-                return RedirectToAction("Edit", "Collections", new { id = c.CollectionId.ToString() });
             }
-            else
-            {
-                return RedirectToAction("Forbiden", "Home");
-            }
+            return View();
         }
         public async Task<IActionResult> Edit(int id)
         {
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null)
+            {
+                ViewData["userId"] = user.UserId;
+
+            }
             HttpResponseMessage response = await client.GetAsync(CollectionApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions

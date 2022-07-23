@@ -14,7 +14,7 @@ namespace BusinessObjects.Models
         public int ReportId { get; set; }
         public int CommentId { get; set; }
         [ForeignKey("CommentId")]
-        [JsonIgnore]
+       
         public virtual Comment Comment { get; set; }
         public string Text { get; set; }
     }

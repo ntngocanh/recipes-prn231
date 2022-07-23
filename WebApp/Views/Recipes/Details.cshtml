@@ -18,10 +18,6 @@
                 @if (ViewData["userId"] != null && (int)ViewData["userId"] == Model.UserId)
                 {
                     <button type="button" class="btn btn-warning" id="edit-btn">Sửa</button>
-                    <span class="clickable deleteRecipe" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <span id="delete-recipe" style="cursor: pointer;">Xóa công thức</span>
-                    </div>
                 }
             </div>
         </nav>
@@ -242,25 +238,6 @@
 <script type="text/javascript">
     $("#edit-btn").on("click", function () {
         window.location.href = "/Recipes/Edit/" + @Model.RecipeId;
-    });
-    $("#delete-recipe").on("click", function () {
-        if (confirm("Do you really want to delete this recipe?")) {
-
-            $.ajax({
-                url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
-                type: "delete",
-            headers: {
-                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
-            },
-                contentType: "application/json",
-                success: function (result, status, xhr) {
-                    window.location.href = "/Home/Index";
-                },
-                error: function (xhr, status, error) {
-                    console.log(xhr)
-                }
-            });
-        }
     });
     $(document).ready(function () {
         if (!'@ViewData["userId"]') {

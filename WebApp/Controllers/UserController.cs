@@ -13,6 +13,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using BusinessObjects.Models;
+using WebApp.Models;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace WebApp.Controllers
 {
@@ -98,6 +102,15 @@ namespace WebApp.Controllers
         [HttpGet("user/myprofile/mycollections")]
         public async Task<IActionResult> MyCollections()
         {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
             UserDTO currentUser = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
             if (currentUser != null)
             {
@@ -110,6 +123,7 @@ namespace WebApp.Controllers
                 UserDTO user = JsonSerializer.Deserialize<UserDTO>(strData, options);
 
                 //get recipes by user
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 response = await client.GetAsync(CollectionApiUrl + "/user/" + currentUser.UserId);
                 string strData2 = await response.Content.ReadAsStringAsync();
                 List<CollectionDTO> collections = JsonSerializer.Deserialize<List<CollectionDTO>>(strData2, options);
@@ -121,6 +135,85 @@ namespace WebApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+        [HttpGet("user/myprofile/edit")]
+        public async Task<IActionResult> EditProfile()
+        {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            UserDTO currentUser = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (currentUser != null)
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                HttpResponseMessage response = await client.GetAsync(UserApiUrl + "/myprofile");
+                string strData = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                UserDTO user = JsonSerializer.Deserialize<UserDTO>(strData, options);
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+        //[HttpPost("user/myprofile/edit")]
+        //public async Task<IActionResult> EditProfile(UserDTO model,IFormFile ava, [FromServices] IHostingEnvironment hostingEnvironment)
+        //{
+        //    string token = "";
+        //    if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+        //    {
+        //        token = HttpContext.Session.GetString("token");
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("Error", "Home");
+        //    }
+        //    if (ModelState.IsValid)
+        //    {
+        //        string uniqueFileName = null;
+        //        if (model.Avatar != null)
+        //        {
+        //            string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images");
+        //            uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Avatar.FileName;
+        //            using (var fs = new FileStream(Path.Combine(uploadsFolder, uniqueFileName), FileMode.Create))
+        //            {
+        //                await model.Avatar.CopyToAsync(fs);
+        //            }
+        //        }
+        //        var user = new User
+        //        {
+        //            UserId = model.UserId,
+        //            Name = model.Name,
+        //            Email = model.Email,
+        //            Password = model.Password,
+        //            Avatar = uniqueFileName,
+        //            RoleId = model.RoleId
+        //        };
+        //        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        //        var json = JsonSerializer.Serialize(user);
+        //        var data = new StringContent(json, Encoding.UTF8, "application/json");
+        //        HttpResponseMessage response = await client.PutAsync(UserApiUrl + "/" + user.UserId, data);
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            return RedirectToAction("MyRecipes");
+        //        }
+        //        else
+        //        {
+        //            return RedirectToAction("Forbiden", "Home");
+        //        }
+        //    }
+        //    return View(model);
+            
+        //}
         [HttpPut]
         public async Task<IActionResult> RequestVIPAsync() {
 

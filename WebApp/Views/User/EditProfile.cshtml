@@ -1,0 +1,119 @@
+﻿@model BusinessObjects.DTO.UserDTO
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <input type="file" accept="image/*" id="input-avatar-image" />
+            <input type="hidden" value="@Model.Avatar" id="avatar-file-name" />
+        </div>
+        <div class="fill">
+            @if (Model.Avatar != null && Model.Avatar.Trim().Length > 0)
+            {
+
+                <img src="~/images/fromUsers/@Model.Avatar" height="200" alt="Image preview..." id="avatar-image">
+            }
+            else
+            {
+                <img src="~/images/avatar.png" height="200" alt="Image preview..." id="avatar-image">
+            }
+        </div>
+        <div class="form-group">
+            <label>User ID</label>
+            <input value="@Model.UserId" disabled>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input value="@Model.Email" disabled>
+        </div>
+        <div class="form-group">
+            <label>Name</label>
+            <input value="@Model.Name" id="name-box">
+        </div>
+        <div>
+            <button id="save-btn">Cập nhật</button>
+            <button id="cancel-btn">Bỏ qua</button>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+<script>
+    $("#cancel-btn").on("click", function () {
+        window.location.href = "/user/myprofile/myrecipes";
+    });
+    $("#save-btn").on("click", function () {
+        //save file to images folder
+        var file = document.getElementById("input-avatar-image").files[0];
+        var formData = new FormData();
+        formData.append("input-avatar-image", file);
+        $.ajax({
+            type: "POST",
+            url: '/Recipes/UploadImage',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                $("#avatar-file-name").val(response);
+                patch();
+            },
+            error: function (error) {
+                alert("error: " + error);
+            }
+        });
+    });
+    function patch() {
+
+        $.ajax({
+            url: "https://localhost:5001/api/Users/" + @Model.UserId,
+            type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()",
+                "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "avatar",
+                "value": $("#avatar-file-name").val()
+            },
+                {
+                    "op": "replace",
+                    "path": "name",
+                    "value": $("#name-box").val()
+                }
+            ]),
+            processData: false,
+            contentType: "application/json",
+                success: function (result, status, xhr) {
+                window.location.href = "/user/myprofile/myrecipes";
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+    }
+    //when user uploads a new image for the recipe
+    $("#input-avatar-image").change(function () {
+        //show preview images
+        var preview = document.getElementById('avatar-image');
+        var file = document.getElementById("input-avatar-image").files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -74,7 +74,7 @@ namespace WebApp.Controllers
         {
             foreach (var formFile in Request.Form.Files)
             {
-                var fulPath = Path.Combine(_env.ContentRootPath, "wwwroot\\images", formFile.FileName);
+                var fulPath = Path.Combine(_env.ContentRootPath, "wwwroot\\images\\fromUsers", formFile.FileName);
                 using (FileStream fs = System.IO.File.Create(fulPath))
                 {
                     formFile.CopyTo(fs);

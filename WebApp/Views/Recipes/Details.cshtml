@@ -22,7 +22,7 @@
         {
 
             <div class="fill">
-                <img src="~/images/@Model.Image" height="200" alt="Recipe Image" id="recipeImage">
+                <img src="~/images/fromUsers/@Model.Image" height="200" alt="Recipe Image" id="recipeImage">
             </div>
         }
         <div class="section">
@@ -54,11 +54,11 @@
             @foreach (var item in Model.Steps)
             {
                 <div class="step-div">
-                    <span>@item.Order .</span>
-                    <span>@item.Text</span>
+                    <img src="~/images/fork-knife.png" class="step-icon"/>
+                    <span>. @item.Text</span>
                     @if (item.Image != null && item.Image.Trim().Length > 0)
                     {
-                        <img class="step-img" src="~/images/@item.Image" />
+                        <img class="step-img" src="~/images/fromUsers/@item.Image" />
                     }
                 </div>
 

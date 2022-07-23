@@ -35,7 +35,7 @@
                 </div>
                 @if (@HttpContextAccessor.HttpContext.Session.GetString("user") != null)
                 {
-                    @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Premium")
+                    @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Premium User")
                     {
                         @if (@SessionExtension.Get<UserDTO>(@HttpContextAccessor.HttpContext.Session, "user").RoleName != "Admin")
                         {

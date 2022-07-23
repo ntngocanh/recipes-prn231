@@ -72,7 +72,10 @@ input {
     margin-bottom: 10px;
     font-size: 19px;
 }
-
+.step-icon{
+    height:20px;
+    border-radius: 50%;
+}
 .form-rounded {
     border-radius: 1rem;
 }

@@ -255,6 +255,12 @@ namespace API.Controllers
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
                 yield return day;
         }
+        // GET: api/Recipes
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
+        {
+            return await _context.Recipes.Where(r => r.UserId == userId).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
 
     }
 }

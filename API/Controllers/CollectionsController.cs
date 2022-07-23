@@ -64,7 +64,7 @@ namespace API.Controllers
                 {
                     Recipe r = _context.Recipes.FirstOrDefault(x => x.RecipeId == cr.RecipeId);
                     string image = r.Image;
-                    if (image.Length > 0)
+                    if (image !=null && image.Length > 0)
                         c.Image = image;
                     c.NumberOfRecipes = CountRecipes(c.CollectionId);
                 }

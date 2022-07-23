@@ -112,7 +112,7 @@
                         appendElement.append($("<td>").html("<a onclick='accept(" + value["userId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
                         appendElement.append($("<td>").html("<a onclick='reject(" + value["userId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
                     });
-                    var table = $('#example').DataTable();
+                    var table = $('#table').DataTable();
                     table.clear();
                     $('#table').DataTable();
 
@@ -128,9 +128,5 @@
     $(document).ready(function () {
         showUser();
         $.noConflict();
-
-
-
-        s
     });
 </script>

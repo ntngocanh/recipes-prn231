@@ -69,7 +69,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         else {
-                            raw += "<img src='"+"../Images/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='"+"../Images/fromUsers/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         raw += "<a href='../User/Profile/"+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
                         raw +="<div class=\"card\" style=\"width: 15rem;\">";
@@ -78,7 +78,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
                         }
                         else {
-                            raw += "<img src='" + "../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='" + "../Images/fromUsers/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         
                         raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";
@@ -119,7 +119,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         else {
-                            raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='" + "../Images/fromUsers/" + value["user"]["avatar"] + "' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         raw += "<a href='../User/Profile?Id=" + value["user"]["userId"] + "'> " + value["user"]["name"] +"</a>";
                         raw += "<div class=\"card\" style=\"width: 15rem;\">";
@@ -128,7 +128,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
                         }
                         else {
-                            raw += "<img src='" + "../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='" + "../Images/fromUsers/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
                         }
 
                         raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";
@@ -172,7 +172,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
                         }
                         else {
-                            raw += "<img src='" + "../Images/" + value["user"]["avatar"] + "' class='img-circle thumbnail' alt='...'>";
+                            raw += "<img src='" + "../Images/fromUsers/" + value["user"]["avatar"] + "' class='img-circle thumbnail' alt='...'>";
                         }
 
                         raw += "<h5 class=\"card-title\">" + value["user"]["name"] + "</h5>";

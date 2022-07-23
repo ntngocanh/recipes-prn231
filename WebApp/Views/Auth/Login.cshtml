@@ -1,34 +1,73 @@
 ﻿@model BusinessObjects.DTO.LoginModel;
 @{
 }
-<div class="container">
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/login.css">
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 mx-auto">
+                <div id="first">
+                    <div class="myform form ">
+                        <div class="logo mb-3">
+                            <div class="col-md-12 text-center">
+                                <h1>Login</h1>
+                            </div>
+                        </div>
+                        <form asp-action="Login" method="post">
+                            <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                            <div class="form-group">
+                                <label asp-for="Email" for="exampleInputEmail1">Email address</label>
+                                <input asp-for="Email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Password" for="exampleInputEmail1">Password</label>
+                                <input asp-for="Password" type="password" name="password" id="password" class="form-control" aria-describedby="emailHelp" placeholder="Enter Password">
+                            </div>
 
-    <form asp-action="Login" method="post">
-        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
-        <div class="form-group row">
-            <div class="col-2">
-                <label asp-for="Email"></label>
+                            <div class="col-md-12 text-center ">
+                                <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Login</button>
+                            </div>
+                            <div class="form-group">
+                                <p style="margin-top: 30px;" class="text-center">Don't have account? <a href="Register" id="signup">Sign up here</a></p>
+                            </div>
+                        </form>
 
+                    </div>
+                </div>
             </div>
-            <div class="col-5">
-                <input required asp-for="Email">
-
-            </div>
-            <span class="text-danger" asp-validation-for="Email"></span>
         </div>
-        <div class="form-group row">
-            <div class="col-2">
-                <label asp-for="Password"></label>
+        @*<form asp-action="Login" method="post">
+                <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label asp-for="Email"></label>
 
-            </div>
-            <div class="col-5">
-                <input required asp-for="Password">
+                    </div>
+                    <div class="col-5">
+                        <input required asp-for="Email">
 
-            </div>
-            <span class="text-danger" asp-validation-for="Password"></span>
-        </div>
-        <div class="form-group" row>
-            <input type="submit" class="btn btn-danger" value="login">
-        </div>
-    </form>
+                    </div>
+                    <span class="text-danger" asp-validation-for="Email"></span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label asp-for="Password"></label>
+
+                    </div>
+                    <div class="col-5">
+                        <input required asp-for="Password">
+
+                    </div>
+                    <span class="text-danger" asp-validation-for="Password"></span>
+                </div>
+                <div class="form-group" row>
+                    <input type="submit" class="btn btn-danger" value="login">
+                </div>
+            </form>*@
+
+
+    </div>
 </div>

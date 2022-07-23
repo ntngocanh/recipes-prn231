@@ -107,6 +107,7 @@ namespace WebApp.Controllers
                 {
                     Email = model.Email,
                     Password = model.Password,
+                    Name = model.Name,
                     RoleId = 2,
                     Avatar = ""
                 };

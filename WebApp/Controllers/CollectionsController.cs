@@ -97,5 +97,15 @@ namespace WebApp.Controllers
             }
             return View();
         }
+        public IActionResult Recipes(int id)
+        {
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null)
+            {
+                ViewData["userId"] = user.UserId;
+                ViewData["collId"] = id;
+            }
+            return View();
+        }
     }
 }

@@ -44,11 +44,12 @@
                     contentType: "application/json;charset=utf-8",
                     dataType: "json",
                     success: function (result, status, xhr) {
-
+                        $('#table').DataTable().clear();
                         showUser();
 
                     },
                     error: function (xhr, status, error) {
+                        showUser();
                         console.log(xhr);
                     }
 
@@ -57,6 +58,7 @@
 
             },
             error: function (xhr, status, error) {
+                showUser();
                 console.log(xhr);
             }
 
@@ -74,11 +76,12 @@
                 "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
             },
             success: function (result, status, xhr) {
-
+                $('#table').DataTable().clear();
                 showUser();
 
             },
             error: function (xhr, status, error) {
+                showUser();
                 console.log(xhr);
             }
 
@@ -86,16 +89,9 @@
 
 
     }
-</script>
-<script>
-    $(document).ready(function () {
-        showUser();
-        $.noConflict();
-
-
-
-        function showUser() {
+    function showUser() {
             $("table tbody").html("");
+
             $.ajax({
                 url: "https://localhost:5001/api/Users/PremiumRequest",
                 type: "get",
@@ -116,6 +112,8 @@
                         appendElement.append($("<td>").html("<a onclick='accept(" + value["userId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
                         appendElement.append($("<td>").html("<a onclick='reject(" + value["userId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
                     });
+                    var table = $('#example').DataTable();
+                    table.clear();
                     $('#table').DataTable();
 
                 },
@@ -125,5 +123,14 @@
 
             });
         }
+</script>
+<script>
+    $(document).ready(function () {
+        showUser();
+        $.noConflict();
+
+
+
+        s
     });
 </script>

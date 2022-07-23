@@ -126,15 +126,15 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("Premium/{Id}")]
+
+        [HttpPut("Premium/{Id}")]
         public ActionResult UpgradeToPremium(int Id) {
             var u = _context.Users.FirstOrDefault(x => x.UserId == Id);
             if (u == null) {
                 return NotFound();
             }
             if (u.RoleId == 3) {
-                return AcceptedAtAction("User is already premium!");
+                return Ok("User is already premium!");
             }
             u.RoleId = 3;
             _context.SaveChanges();
@@ -143,8 +143,8 @@ namespace API.Controllers
 
 
 
-        [HttpPut]
-        [Route("RequestVIP/{Id}")]
+
+        [HttpPut("RequestVIP/{Id}")]
         public ActionResult Request(int Id)
         {
             var u = _context.Users.FirstOrDefault(x => x.UserId == Id);
@@ -152,10 +152,7 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-            if (u.RoleId == 3)
-            {
-                return AcceptedAtAction("User is already premium!");
-            }
+          
             if (u.RequestToVIP == false)
                 u.RequestToVIP = true;
             else u.RequestToVIP = false;

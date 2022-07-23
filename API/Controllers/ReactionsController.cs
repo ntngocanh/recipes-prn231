@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class ReactionsController : ControllerBase
     {
         private readonly RecipeDbContext _context;
@@ -52,6 +54,8 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+
         public IActionResult PostReaction(ReactionRequestDTO reaction)
         {
             try
@@ -68,6 +72,8 @@ namespace API.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
+
         public IActionResult DeleteReaction(ReactionRequestDTO reaction)
         {
             try
@@ -87,6 +93,8 @@ namespace API.Controllers
         }
 
         [HttpPut]
+        [Authorize]
+
         public IActionResult EditReaction(ReactionRequestDTO reaction)
         {
             try

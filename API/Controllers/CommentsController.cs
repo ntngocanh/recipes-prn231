@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessObjects.DTO;
 using BusinessObjects.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -105,6 +106,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> PostComment(CommentRequest comment)
         {
             /*try
@@ -129,6 +131,7 @@ namespace API.Controllers
 
         }
         [HttpPost("reportComment/{commentId}")]
+
         public async Task<IActionResult> ReportComment(Report report)
         {
             _context.Reports.Add(report);
@@ -141,6 +144,7 @@ namespace API.Controllers
 
         }
         [HttpPut("{commentId}")]
+        [Authorize]
         public IActionResult EditComment(CommentRequest comment, int commentId)
         {
             try
@@ -159,8 +163,10 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{commentId}")]
+        [Authorize]
+
         public IActionResult DeleteComment(int commentId)
         {
             try
@@ -199,6 +205,7 @@ namespace API.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("Report/{reportId}")]
         public IActionResult DeleteReport(int reportId)
         {
@@ -216,7 +223,7 @@ namespace API.Controllers
                         return NotFound();
                     }
                     c.CommentStatus = CommentStatus.Posted;
-
+                    _context.Remove(report);
                     _context.SaveChanges();
                 }
                

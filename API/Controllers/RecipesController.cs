@@ -290,7 +290,7 @@ namespace API.Controllers
             }
             var configuration = new MapperConfiguration(cf => cf.AddProfile(new RecipeProfile()));
 
-            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString));
+            IQueryable<Recipe> recipesList = _context.Recipes.Include(x => x.User).Include(x => x.Reactions).Where(x => x.Name.Contains(parameters.SearchString) && DateTime.Compare(x.DateCreated, parameters.MinDate) >= 0 && DateTime.Compare(x.DateCreated, parameters.MaxDate) <= 0 && x.RecipeStatus == RecipeStatus.Published);
             List<RecipeDTO> recipeDTOs = recipesList.ProjectTo<RecipeDTO>(configuration).ToList();
             recipeDTOs.Sort((x, y) => y.Popularity.CompareTo(x.Popularity));
             var recipes = PagedList<RecipeDTO>.ToPagedList(recipeDTOs.AsQueryable(), parameters.PageNumber, parameters.PageSize);

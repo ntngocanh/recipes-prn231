@@ -30,6 +30,7 @@
             </div>
             <div>
                 <a id="back" href="../MyCollections">Back to List</a>
+                <a id="login" href="../Auth/Login" style="display:none"></a>
             </div>
         </form>
     </div>
@@ -41,7 +42,10 @@
 }
 <script type="text/javascript">
     $(document).ready(function() {
-        
+        if (@ViewData["userId"] == 0)
+        { 
+            $("#login")[0].click();
+        }
         $("#collectionCreate").click(function(e) {
             data = new FormData();
             data.append("Name", $("#nameBox").val());

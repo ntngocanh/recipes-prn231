@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Edit";
 }
-<link rel="stylesheet" href="~/css/createRecipe.css" />
+<link rel="stylesheet" href="~/css/editRecipe.css" />
 
 <div class="row">
     <div class="col-md-2"></div>
@@ -125,7 +125,7 @@
         if (confirm("Do you really want to delete this recipe?")) {
 
             $.ajax({
-                url: "https://localhost:5001/api/Recipes/" + id,
+                url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
                 type: "delete",
                 contentType: "application/json",
                 success: function (result, status, xhr) {
@@ -165,7 +165,6 @@
             contentType: false,
             processData: false,
             success: function (response) {
-                console.log("image uploaded: " + response);
                 imageChanged(response);
             },
             error: function (error) {

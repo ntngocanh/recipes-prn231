@@ -57,10 +57,35 @@ namespace WebApp.Controllers
             ViewBag.Comments = comments;
             return View(recipe);
         }
-        //public async Task<IActionResult> Create()
-        //{
-        //    return View();
-        //}
+        public async Task<IActionResult> Draft()
+        {
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/drafts/" + user.UserId);
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                List<RecipeDTO> recipes = JsonSerializer.Deserialize<List<RecipeDTO>>(data, options);
+                return View(recipes);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
         public async Task<IActionResult> Create()
         {
             Recipe recipe = new Recipe()

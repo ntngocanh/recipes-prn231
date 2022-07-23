@@ -29,7 +29,7 @@
                 </div>
                 @if (@HttpContextAccessor.HttpContext.Session.GetString("user") != null)
                 {
-                    <div class="d-flex right-item">
+                    <div class="d-flex right-item" id="create-btn">
                         <img src="~/images/plus-icon.png" />
                         <span>Viết món mới</span>
                     </div>
@@ -70,6 +70,9 @@
             if (confirm("Bạn chắc chắn muốn đăng xuất?")){
                 window.location.href = "/Auth/Logout";
             };
+        });
+        $("#create-btn").on("click", function () {
+                window.location.href = "/Recipes/Draft";
         });
     </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

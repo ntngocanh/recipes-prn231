@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using BusinessObjects.DTO;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,25 +18,46 @@ namespace WebApp.Controllers
         {
             _env = env;
         }
+        
         public IActionResult Index()
         {
-            return View();
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null && user.RoleName=="Admin")
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Auth");
         }
 
         public IActionResult UserList()
         {
 
-            return View();
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null && user.RoleName == "Admin")
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Auth");
         }
 
         public IActionResult EditUser(int id)
         {
-            return View();
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null && user.RoleName == "Admin")
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Auth");
         }
 
         public IActionResult ReportList()
         {
-            return View();
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null && user.RoleName == "Admin")
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Auth");
         }
         [HttpPost]
         public IActionResult UploadFile()

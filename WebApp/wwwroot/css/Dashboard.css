@@ -187,3 +187,14 @@ a.article:hover {
         max-width:100%;
     }
 }
+.right-item {
+    font-size: 15px;
+    margin-left: 30px;
+    cursor: pointer;
+    max-height: 32px;
+}
+
+    .right-item img {
+        max-height: 30px;
+        border-radius: 50%;
+    }

@@ -243,7 +243,9 @@
     $("#edit-btn").on("click", function () {
         window.location.href = "/Recipes/Edit/" + @Model.RecipeId;
     });
-    $("#delete-recipe").on("click", function () {
+    
+       
+        $("#delete-recipe").on("click", function () {
         if (confirm("Do you really want to delete this recipe?")) {
 
             $.ajax({
@@ -262,6 +264,8 @@
             });
         }
     });
+    
+
     $(document).ready(function () {
         if (!'@ViewData["userId"]') {
             $("#comment-input").prop('disabled', true);

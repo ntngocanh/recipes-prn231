@@ -126,6 +126,8 @@
         
 
         function ViewMode() {
+            //var property = <%=session.getAttribute('user')%>;
+            //alert(property);
             let params = (new URL(document.location)).searchParams;
             let id = params.get("Id");
             if (sessionStorage.getItem("user") == null) {

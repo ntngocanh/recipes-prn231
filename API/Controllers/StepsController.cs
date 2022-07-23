@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -42,58 +44,47 @@ namespace API.Controllers
             return step;
         }
 
-        // PUT: api/Steps/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStep(int id, Step step)
-        {
-            if (id != step.StepId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(step).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StepExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // POST: api/Steps
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Step>> PostStep(Step step)
+        public async Task<ActionResult<int>> PostStep(Step step)
         {
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            Recipe recipe = _context.Recipes.FirstOrDefault(r => r.RecipeId == step.RecipeId);
+            if (recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Steps.Add(step);
             await _context.SaveChangesAsync();
 
-            return step;
+            return step.StepId;
         }
 
         // DELETE: api/Steps/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStep(int id)
         {
-            var step = await _context.Steps.FindAsync(id);
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            var step = await _context.Steps.Include(i => i.Recipe).FirstOrDefaultAsync(i => i.StepId == id);
             if (step == null)
             {
                 return NotFound();
             }
-
+            if (step.Recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             _context.Steps.Remove(step);
             await _context.SaveChangesAsync();
 
@@ -104,20 +95,30 @@ namespace API.Controllers
         {
             return _context.Steps.Any(e => e.StepId == id);
         }
+        [Authorize]
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, [FromBody] JsonPatchDocument<Step> patchEntity)
         {
-            var entity = _context.Steps.FirstOrDefault(r => r.StepId == id);
+            var userId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                userId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+
+            var entity = _context.Steps.Include(i => i.Recipe).FirstOrDefault(i => i.StepId == id);
 
             if (entity == null)
             {
                 return NotFound();
             }
-
+            if (entity.Recipe.UserId != userId)
+            {
+                return Unauthorized();
+            }
             patchEntity.ApplyTo(entity);
             _context.SaveChanges();
 
-            return Ok(entity);
+            return NoContent();
         }
     }
 }

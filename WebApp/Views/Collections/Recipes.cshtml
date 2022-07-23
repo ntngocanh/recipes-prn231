@@ -6,15 +6,15 @@
     <br />
     <br />
     <br />
-
+    <form action="/Collections/Edit/@ViewBag.CollId" style="display:inline; float:right;">
+        <input type="submit" value="Chỉnh sửa" style="width:100px" class="btn btn-primary"/>
+    </form>
     <div class="row">
+    
         <div class="col-8"><p class="newestdish" id="collectionName" filter-content="S"></p></div>
     </div>
         <p style="margin:auto" id="collectionDesc"></p>
         <br>
-    @*<form action="/Collection/Edit/" asp-route-id="@ViewData["collId"]" style="display:inline">
-        <input type="submit" value="Edit" style="width:100px"/>
-    </form>*@
     <div id="newest" class="row">
     </div>
     <div style="align-content: center; display: flex">
@@ -86,7 +86,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         else {
-                            raw += "<img src='"+"../../Images/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='"+"../../Images/fromUsers/" + value["user"]["avatar"]+"' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         raw += "<a href='../../User/Details?Id="+value["user"]["userId"]+"'> " + value["user"]["name"]+"</a>";
                         raw +="<div class=\"card\" style=\"width: 15rem;\">";
@@ -95,7 +95,7 @@
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
                         }
                         else {
-                            raw += "<img src='" + "../../Images/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
+                            raw += "<img src='" + "../../Images/fromUsers/" + value["image"] + "' class='img-circle thumbnail' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         
                         raw += "<h5 class=\"card-title\">" + value["name"] + "</h5>";

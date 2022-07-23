@@ -17,8 +17,4 @@
     <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Collections\" />
-  </ItemGroup>
-
 </Project>

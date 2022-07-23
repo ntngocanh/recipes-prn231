@@ -28,6 +28,33 @@ namespace API.Controllers
 
 //Get All Collections of user
 
+        [HttpGet("getByUser/{userId}")]
+        public IActionResult GetByUser(int userId)
+        {
+            if (_context.Users.FirstOrDefault(x => x.UserId == userId) == null)
+            {
+                return NotFound();
+            }
+            List<Collection> collections = _context.Collections.Where(x => x.UserId == userId).ToList();
+            if (collections == null)
+            {
+                return NotFound();
+            }
+            List<CollectionDTO> collectionDTOs = collections.Select(m => mapper.Map<Collection, CollectionDTO>(m)).ToList();
+            foreach (CollectionDTO c in collectionDTOs)
+            {
+                //string image = _context.Recipes.FirstOrDefault(x => x.RecipeId == _context.CollectionRecipes
+                //                          .FirstOrDefault(x => x.CollectionId == c.CollectionId).RecipeId)
+                //                          .Image;
+                //if (image!=null)
+                //    c.Image = image;
+                c.NumberOfRecipes = CountRecipes(c.CollectionId);
+            }
+            return Ok(collectionDTOs);
+        }
+
+//Get All Collections of user without recipe
+
         [HttpGet("getByUser/{userId}/{recipeId}")]
         public IActionResult GetByUser(int userId, int recipeId)
         {

@@ -42,8 +42,14 @@ namespace WebApp.Controllers
             if (user!= null)
             {
                 ViewData["userId"] = user.UserId;
-
             }
+            string token = "";
+            if (HttpContext.Session.Get("token") != null && HttpContext.Session.Get("user") != null)
+            {
+                token = HttpContext.Session.GetString("token");
+                ViewData["token"] = token;
+            }
+
             HttpResponseMessage response = await client.GetAsync(RecipesApiUrl + "/" + id);
             string strData = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions

@@ -4,7 +4,8 @@
 @{
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
-
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
 <h2>
     User
 </h2>
@@ -29,13 +30,16 @@
         showUser();
         $.noConflict();
 
-            
+
 
         function showUser() {
             $("table tbody").html("");
             $.ajax({
                 url: "https://localhost:5001/api/Users",
                 type: "get",
+                 headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (result, status, xhr) {
@@ -45,7 +49,7 @@
                         appendElement.append($("<td>").html(value["userId"]));
                         appendElement.append($("<td>").html(value["name"]));
                         appendElement.append($("<td>").html(value["email"]));
-                        appendElement.append($("<td>").html(value["avatar"]));
+                        appendElement.append($("<td>").html("<img class='icon' src=\"../images/" + value["avatar"] + "\"/>"));
                         appendElement.append($("<td>").html(value["role"]["roleName"]));
                         appendElement.append($("<td>").html("<a  href=\"EditUser\?Id=" + value["userId"] + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
                     });

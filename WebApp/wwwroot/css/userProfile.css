@@ -1,0 +1,48 @@
+﻿body {
+    background-color: #F8F6F2;
+}
+.card {
+    padding-top: 20px;
+}
+.avatar-container{
+    margin: 0;
+}
+.user-avatar {
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 150px;
+    max-width: 150px;
+    border-radius: 50%;
+    margin: auto;
+}
+.user-avatar img {
+    flex-shrink: 0;
+    height: 150px;
+    width: 150px;
+}
+.nav{
+    margin-top: 30px;
+}
+.section{
+    padding: 0;
+    margin-top: 50px;
+}
+.recipe-card {
+    padding: 0;
+    background-color: inherit;
+    border: hidden;
+    cursor: pointer;
+}
+.recipe-image {
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    max-height: 200px;
+    border-radius: .25rem;
+    margin: 10px;
+}
+.recipe-image img {
+    flex-shrink: 0;
+    max-height: 200px;
+}

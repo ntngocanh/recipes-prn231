@@ -64,6 +64,7 @@ namespace WebApp.Controllers
                 u.Name = userClaims.FirstOrDefault(o => o.Type == "Name")?.Value;
                 u.Avatar = userClaims.FirstOrDefault(o => o.Type == "Avatar")?.Value;
                 u.RoleName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value;
+                u.RequestToVIP = Convert.ToBoolean( userClaims.FirstOrDefault(o => o.Type == "RequestToVIP")?.Value);
                 SessionExtension.Set<UserDTO>(HttpContext.Session, "user", u);
                 HttpContext.Session.SetString("token", token);
                 return RedirectToAction("Index", "Home");

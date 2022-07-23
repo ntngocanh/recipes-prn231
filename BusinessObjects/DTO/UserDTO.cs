@@ -13,5 +13,7 @@ namespace BusinessObjects.DTO
         public string Name { get; set; }
         public string Avatar { get; set; }
         public string RoleName { get; set; }
+
+        public bool RequestToVIP { get; set; }
     }
 }

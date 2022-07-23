@@ -35,6 +35,7 @@
             
                 <div class="form-group">
                     <button id="collectionCreate" class="btn btn-primary">Lưu chỉnh sửa</button>
+                    <a id="back" href="../Recipes/@Model.CollectionId" style="display:none"></a>
                 </div>
             </form>
         </div> 
@@ -69,7 +70,7 @@
                 contentType: "application/json",
                 success: function(result, status, xhr) {
                     console.log(status)
-                    //$("#back")[0].click();
+                    $("#back")[0].click();
                 },
                 error: function(xhr, status, error) {
                     console.log(xhr);

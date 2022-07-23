@@ -86,5 +86,27 @@ namespace WebApp.Controllers
             CollectionDTO collection = JsonSerializer.Deserialize<CollectionDTO>(strData, options);
             return View(collection);
         }
+
+        public IActionResult MyCollections()
+        {
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null)
+            {
+                ViewData["userId"] = user.UserId;
+
+            }
+            return View();
+        }
+        public IActionResult Recipes(int id)
+        {
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null)
+            {
+                ViewData["userId"] = user.UserId;
+                ViewData["collId"] = id;
+                ViewBag.CollId = id;
+            }
+            return View();
+        }
     }
 }

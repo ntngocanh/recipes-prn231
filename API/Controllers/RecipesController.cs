@@ -257,7 +257,23 @@ namespace API.Controllers
             for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
                 yield return day;
         }
-
+        // recipes by a user
+        [Authorize]
+        [HttpGet("myrecipes")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetMyRecipes()
+        {
+            var uId = -1;
+            if (HttpContext.User.Identity is ClaimsIdentity identity)
+            {
+                uId = Int32.Parse(identity.FindFirst("Id").Value);
+            }
+            return await _context.Recipes.Where(r => r.UserId == uId).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<IEnumerable<RecipeDTO>>> GetRecipesByUserId(int userId)
+        {
+            return await _context.Recipes.Where(r => r.UserId == userId).ProjectTo<RecipeDTO>(config).ToListAsync();
+        }
         [HttpGet("search")]
         public IActionResult SearchRecipes([FromQuery] RecipeSearchParameters parameters)
         {

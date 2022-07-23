@@ -11,13 +11,17 @@
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <nav class="navbar">
-            <button class="btn btn-sm btn-outline-success" type="button" id="backBtn">Quay lại</button>
-            <div class="nav-item dropdown">
-                <span class="clickable deleteRecipe" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <span class="deleteIngre" id="delete-recipe">Xóa công thức</span>
+                <button class="btn btn-sm btn-outline-success" type="button" id="backBtn">Quay lại</button>
+                <div class="nav-item dropdown">
+                    @if (Model.RecipeStatus == BusinessObjects.Models.RecipeStatus.Draft)
+                    {
+                        <button type="button" class="btn btn-warning" id="air-btn">Lên sóng</button>
+                    }
+                    <span class="clickable deleteRecipe" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">...</span>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <span class="deleteIngre" id="delete-recipe">Xóa công thức</span>
+                    </div>
                 </div>
-            </div>
         </nav>
     </div>
 </div>
@@ -131,6 +135,30 @@
     $("#backBtn").on("click", function () {
         window.location.href = "/Recipes/Details/" + @Model.RecipeId;
     });
+    $("#air-btn").on("click", function () {
+        if (confirm("Bạn đã sẵn sàng lên sóng món này?")) {
+            $.ajax({
+            url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
+            type: "patch",
+            headers: {
+                "Authorization": "Bearer @HttpContextAccessor.HttpContext.Session.GetString("token").Trim()"
+            },
+            data: JSON.stringify([{
+                "op": "replace",
+                "path": "recipeStatus",
+                "value": 1
+            }]),
+            processData: false,
+            contentType: "application/json",
+                success: function (result, status, xhr) {
+                window.location.href = "/Recipes/Details/" + @Model.RecipeId;
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+            }
+        });
+        }
+    });
     $("#delete-recipe").on("click", function () {
         if (confirm("Do you really want to delete this recipe?")) {
 
@@ -210,7 +238,6 @@
     });
     //description changed
     $(document).on("change", '#descriptionBox', function() {
-        console.log("name changed");
         $.ajax({
             url: "https://localhost:5001/api/Recipes/" + @Model.RecipeId,
             type: "patch",

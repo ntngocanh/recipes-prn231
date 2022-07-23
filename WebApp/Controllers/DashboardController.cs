@@ -59,6 +59,16 @@ namespace WebApp.Controllers
             }
             return RedirectToAction("Login", "Auth");
         }
+
+        public IActionResult RequestList()
+        {
+            UserDTO user = SessionExtension.Get<UserDTO>(HttpContext.Session, "user");
+            if (user != null && user.RoleName == "Admin")
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Auth");
+        }
         [HttpPost]
         public IActionResult UploadFile()
         {

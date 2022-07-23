@@ -88,7 +88,7 @@
                     appendElement.append($("<td>").html(value["comment"]["text"]));
                     appendElement.append($("<td>").html(value["text"]));
                     //appendElement.append($("<td>").html(value["role"]["roleName"]));
-                    appendElement.append($("<td>").html("<a  href=\"../../Recipes/Details/2" + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
+                    appendElement.append($("<td>").html("<a  href=\"../../Recipes/Details/" + value["comment"]["recipeId"] + "\"><img class='icon' src=\"../images/edit.png\"/></a>"));
                     appendElement.append($("<td>").html("<a onclick='accept(" + value["comment"]["commentId"] + ")'><img class='icon' src=\"../images/accept.png\"/></a>"));
                     appendElement.append($("<td>").html("<a onclick='reject(" + value["reportId"] + ")' ><img class='icon' src=\"../images/reject.png\"/></a>"));
                 });

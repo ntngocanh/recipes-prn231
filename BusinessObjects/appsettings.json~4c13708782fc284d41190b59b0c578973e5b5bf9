@@ -1,6 +1,0 @@
-{
-  "ConnectionStrings": {
-    "RecipeDB": "Server=local;Database=RecipeDB;Trusted_Connection=True;"
-
-  }
-}

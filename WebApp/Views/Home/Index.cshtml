@@ -65,7 +65,7 @@
                         
                         raw += "<div class='col-3'>";
 
-                        if (value["user"]["avatar"] == null) {
+                        if (value["user"]["avatar"] == null || value["user"]["avatar"] == "")  {
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         else {
@@ -115,7 +115,7 @@
 
                         raw += "<div class='col-3'>";
 
-                        if (value["user"]["avatar"] == null) {
+                        if (value["user"]["avatar"] == null || value["user"]["avatar"] == "") {
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class='avatar img-circle rounded-circle' alt='...'>&nbsp&nbsp&nbsp";
                         }
                         else {
@@ -168,7 +168,7 @@
                         
                         raw += "<div class=\"card\" style=\"width: 15rem;\">";
                         raw += "<div class=\"card-body\">";
-                        if (value["user"]["avatar"] == null) {
+                        if (value["user"]["avatar"] == null || value["user"]["avatar"] == "")  {
                             raw += "<img src='http://ssl.gstatic.com/accounts/ui/avatar_2x.png' class=' img-circle thumbnail' alt='...'>";
                         }
                         else {

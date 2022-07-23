@@ -86,7 +86,7 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-            List<Collection> collections = _context.Collections.Where(x => x.UserId == userId).ToList();
+            List<Collection> collections = _context.Collections.OrderByDescending(x => x.CollectionId).Where(x => x.UserId == userId).ToList();
             if (collections == null)
             {
                 return NotFound();

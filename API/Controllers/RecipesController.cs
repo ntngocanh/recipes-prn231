@@ -42,7 +42,7 @@ namespace API.Controllers
         [HttpGet("HomePage")]
         public ActionResult<IEnumerable<Recipe>> GetRecipesHomePage()
         {
-            var list=  _context.Recipes.OrderByDescending(x=>x.DateCreated).Include(x=>x.User).ToList();
+            var list=  _context.Recipes.OrderByDescending(x=>x.DateCreated).Where(x=>x.RecipeStatus==RecipeStatus.Published).Include(x=>x.User).ToList();
            
             if (list.Count <=4 ) {
                 return list;
@@ -58,7 +58,7 @@ namespace API.Controllers
         [HttpGet("HomePage/Premium")]
         public ActionResult<IEnumerable<Recipe>> GetRecipesPremium()
         {
-            var list = _context.Recipes.OrderByDescending(x => x.DateCreated).Include(x => x.User).Where(x=>x.User.RoleId==3).ToList();
+            var list = _context.Recipes.OrderByDescending(x => x.DateCreated).Where(x => x.RecipeStatus == RecipeStatus.Published).Include(x => x.User).Where(x=>x.User.RoleId==3).ToList();
 
             if (list.Count <= 4)
             {
@@ -176,9 +176,10 @@ namespace API.Controllers
         }
         [HttpGet("HomePage/Trend")]
         public IActionResult GetTrend() {
-           var user= _context.Recipes
+           var user= _context.Recipes.Where(x => x.RecipeStatus == RecipeStatus.Published)
                          .GroupBy(a => a.UserId)
                          .Select(g => new { g.Key, Count = g.Count() ,User = _context.Users.FirstOrDefault(x=>x.UserId==g.Key)}).ToList();
+            user.Sort((x, y) => y.Count.CompareTo(x.Count));
             if (user.Count <= 4)
                 return Ok(user);
             else {
